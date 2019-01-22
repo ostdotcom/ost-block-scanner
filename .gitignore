@@ -9,7 +9,7 @@
 /.nyc_output/*
 
 package-lock.json
-config.json
+/config.json
 
 # Runtime data
 pids
