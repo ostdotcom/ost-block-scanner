@@ -1,0 +1,12 @@
+{
+"chainId": "1000",
+"providerEndpoint" : "ws://127.0.0:19547",
+"contractAddress": "0x85c3858ebfd3206960cdb25b76169073947d1c84",
+"userAddresses": [
+  "0xd07b2bd6479e3e5d218460f691b940e24f463014",
+  "0x07699aa9c1b43a28029afedf2da7805f64c340c7",
+  "0x758ee62d7ac93af79f31abdbd980fe103154e0ec",
+  "0xeb05447cbe98e8110b439c0e4b387d407dae5b0a",
+  "0x999de864fb0e1bf910ebccb9e3c411633d26ac33"
+]
+}

@@ -1,0 +1,162 @@
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "name": "_from",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "name": "_to",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "name": "_value",
+        "type": "uint256"
+      }
+    ],
+    "name": "Transfer",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "name": "_uuid",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "name": "_stakingIntentHash",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "name": "_token",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "name": "_staker",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "name": "_beneficiary",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "name": "_amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "ProcessedMint",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "name": "_uuid",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "name": "_stakingIntentHash",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "name": "_token",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "name": "_staker",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "name": "_beneficiary",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "name": "_amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "Mint",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "name": "_uuid",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "name": "_stakingIntentHash",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "name": "_staker",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "name": "_beneficiary",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "name": "_amountUT",
+        "type": "uint256"
+      }
+    ],
+    "name": "RevertedMint",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "name": "_uuid",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "name": "_stakingIntentHash",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "name": "_staker",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "name": "_beneficiary",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "name": "_amountUT",
+        "type": "uint256"
+      }
+    ],
+    "name": "Burn",
+    "type": "event"
+  }
+]
