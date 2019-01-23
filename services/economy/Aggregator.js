@@ -14,11 +14,11 @@ const rootPrefix = '../..',
   coreConstants = require(rootPrefix + '/config/coreConstants'),
   logger = require(rootPrefix + '/lib/logger/customConsoleLogger'),
   responseHelper = require(rootPrefix + '/lib/formatter/response'),
-  signatureConstants = require(rootPrefix + '/lib/globalConstant/signatureConstants'),
+  serviceTypes = require(rootPrefix + '/lib/globalConstant/serviceTypes'),
   formatTransactionsData = require(rootPrefix + '/lib/economyAddresses/FormatTransactionsData');
 
 // Define serviceType for getting signature.
-const serviceType = signatureConstants.EconomyAggregator;
+const serviceType = serviceTypes.EconomyAggregator;
 
 const errorConfig = basicHelper.getErrorConfig(),
   batchPagination = 80;

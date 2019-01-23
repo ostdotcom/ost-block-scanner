@@ -12,14 +12,14 @@ const rootPrefix = '../..',
   coreConstants = require(rootPrefix + '/config/coreConstants'),
   responseHelper = require(rootPrefix + '/lib/formatter/response'),
   paginationLimits = require(rootPrefix + '/lib/globalConstant/paginationLimits'),
-  signatureConstants = require(rootPrefix + '/lib/globalConstant/signatureConstants');
+  serviceTypes = require(rootPrefix + '/lib/globalConstant/serviceTypes');
 
 // Following require(s) for registering into instance composer
 require(rootPrefix + '/lib/models/shared/ShardByEconomyAddress');
 require(rootPrefix + '/lib/cacheMultiManagement/chainSpecific/AddressBalance');
 
 // Define serviceType for getting signature.
-const serviceType = signatureConstants.GetTokenHolders;
+const serviceType = serviceTypes.GetTokenHolders;
 
 /**
  * Class for getting block transactions service

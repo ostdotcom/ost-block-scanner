@@ -12,7 +12,7 @@ const rootPrefix = '../..',
   responseHelper = require(rootPrefix + '/lib/formatter/response'),
   logger = require(rootPrefix + '/lib/logger/customConsoleLogger'),
   web3InteractFactory = require(rootPrefix + '/lib/providers/web3'),
-  mockAbi = require(rootPrefix + '/config/genericData/mockERC20ContractAbi.json'),
+  erc20Abi = require(rootPrefix + '/config/abi/erc20Abi.json'),
   errorConfig = basicHelper.getErrorConfig();
 
 const InstanceComposer = OSTBase.InstanceComposer;
@@ -70,10 +70,10 @@ class FetchAddressTokenBalance {
     const oThis = this;
 
     let web3Interact = await web3InteractFactory.getInstance(oThis.provider),
-      mockContractObj = await web3Interact.getContractObject(mockAbi, oThis.contractAddress);
+      erc20 = await web3Interact.getContractObject(erc20Abi, oThis.contractAddress);
 
     let promise = new Promise(function(onResolve, onReject) {
-      mockContractObj.methods
+      erc20.methods
         .balanceOf(oThis.address)
         .call({})
         .then(function(balance) {

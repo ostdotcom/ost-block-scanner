@@ -10,7 +10,7 @@ const rootPrefix = '../..',
   coreConstants = require(rootPrefix + '/config/coreConstants'),
   responseHelper = require(rootPrefix + '/lib/formatter/response'),
   logger = require(rootPrefix + '/lib/logger/customConsoleLogger'),
-  signatureConstants = require(rootPrefix + '/lib/globalConstant/signatureConstants');
+  serviceTypes = require(rootPrefix + '/lib/globalConstant/serviceTypes');
 
 const InstanceComposer = OSTBase.InstanceComposer;
 
@@ -18,7 +18,7 @@ const InstanceComposer = OSTBase.InstanceComposer;
 require(rootPrefix + '/lib/cacheMultiManagement/chainSpecific/AddressBalance');
 
 // Define serviceType for getting signature.
-const serviceType = signatureConstants.AddressBalance;
+const serviceType = serviceTypes.AddressBalance;
 
 /**
  * Class for non contract address balance service

@@ -10,7 +10,7 @@ const rootPrefix = '../..',
   coreConstants = require(rootPrefix + '/config/coreConstants'),
   logger = require(rootPrefix + '/lib/logger/customConsoleLogger'),
   shardTypeConstants = require(rootPrefix + '/lib/globalConstant/shardType'),
-  signatureConstants = require(rootPrefix + '/lib/globalConstant/signatureConstants');
+  serviceTypes = require(rootPrefix + '/lib/globalConstant/serviceTypes');
 
 const InstanceComposer = OSTBase.InstanceComposer;
 
@@ -23,7 +23,7 @@ require(rootPrefix + '/services/shard/create/ByEconomyAddress');
 require(rootPrefix + '/lib/cacheManagement/shared/AvailableShards');
 
 // Define serviceType for getting signature.
-const serviceType = signatureConstants.ReplaceShard;
+const serviceType = serviceTypes.ReplaceShard;
 
 /**
  * Class for creating a new shard

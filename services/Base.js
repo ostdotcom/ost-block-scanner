@@ -6,12 +6,11 @@
  */
 const rootPrefix = '../',
   basicHelper = require(rootPrefix + '/helpers/basic'),
-  signatureConfig = require(rootPrefix + '/config/signature'),
+  serviceSignature = require(rootPrefix + '/config/serviceSignature').getSignature(),
   responseHelper = require(rootPrefix + '/lib/formatter/response'),
   logger = require(rootPrefix + '/lib/logger/customConsoleLogger');
 
-const errorConfig = basicHelper.getErrorConfig(),
-  internalConfig = signatureConfig.getSignature();
+const errorConfig = basicHelper.getErrorConfig();
 
 /**
  * Base class for all services
@@ -83,7 +82,7 @@ class ServicesBaseKlass {
   async validateAndSanitize() {
     const oThis = this;
 
-    oThis.paramsConfig = internalConfig[oThis.serviceType];
+    oThis.paramsConfig = serviceSignature[oThis.serviceType];
 
     if (!oThis.paramsConfig) {
       return Promise.reject(
@@ -126,7 +125,6 @@ class ServicesBaseKlass {
     }
 
     if (hasError) {
-      console.trace('=====');
       return Promise.reject(
         responseHelper.paramValidationError({
           internal_error_identifier: 's_b_4',

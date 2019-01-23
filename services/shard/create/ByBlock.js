@@ -9,7 +9,7 @@ const rootPrefix = '../../..',
   coreConstants = require(rootPrefix + '/config/coreConstants'),
   logger = require(rootPrefix + '/lib/logger/customConsoleLogger'),
   CreateShardsBase = require(rootPrefix + '/services/shard/create/Base'),
-  shardPrefixConstants = require(rootPrefix + '/lib/globalConstant/shardPrefix');
+  cidPrefix = require(rootPrefix + '/lib/globalConstant/cidPrefix');
 
 const InstanceComposer = OSTBase.InstanceComposer;
 
@@ -37,7 +37,7 @@ class ShardByBlock extends CreateShardsBase {
 
     const oThis = this;
 
-    oThis.identifier = shardPrefixConstants.block + '_' + oThis.chainId;
+    oThis.identifier = cidPrefix.block + '_' + oThis.chainId;
   }
 
   /**

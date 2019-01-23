@@ -12,12 +12,12 @@ const rootPrefix = '../..',
   logger = require(rootPrefix + '/lib/logger/customConsoleLogger'),
   responseHelper = require(rootPrefix + '/lib/formatter/response'),
   fetchTransactionsReceiptsKlass = require(rootPrefix + '/services/chainInteractions/fetchTransactions'),
-  signatureConstants = require(rootPrefix + '/lib/globalConstant/signatureConstants');
+  serviceTypes = require(rootPrefix + '/lib/globalConstant/serviceTypes');
 
 const InstanceComposer = OSTBase.InstanceComposer;
 
 // Define serviceType for getting signature.
-const serviceType = signatureConstants.TransactionParser;
+const serviceType = serviceTypes.TransactionParser;
 
 const errorConfig = basicHelper.getErrorConfig();
 

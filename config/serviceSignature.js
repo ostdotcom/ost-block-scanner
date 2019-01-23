@@ -1,14 +1,14 @@
 'use strict';
 /**
- * Load all the signature constants.
+ * Load all the service signature constants.
  *
- * @module config/signature
+ * @module config/serviceSignature
  */
 const rootPrefix = '..',
-  signatureConstants = require(rootPrefix + '/lib/globalConstant/signatureConstants');
+  serviceTypes = require(rootPrefix + '/lib/globalConstant/serviceTypes');
 
 const signature = {
-  [signatureConstants.CreateShards]: {
+  [serviceTypes.CreateShards]: {
     mandatory: [
       {
         parameter: 'chainId',
@@ -21,7 +21,7 @@ const signature = {
     ],
     optional: []
   },
-  [signatureConstants.BlockParser]: {
+  [serviceTypes.BlockParser]: {
     mandatory: [
       {
         parameter: 'chainId',
@@ -31,7 +31,7 @@ const signature = {
     optional: ['blockToProcess', 'blockDelay']
   },
 
-  [signatureConstants.TransactionParser]: {
+  [serviceTypes.TransactionParser]: {
     mandatory: [
       {
         parameter: 'chainId',
@@ -53,7 +53,7 @@ const signature = {
     optional: []
   },
 
-  [signatureConstants.TokenTransferParser]: {
+  [serviceTypes.TokenTransferParser]: {
     mandatory: [
       {
         parameter: 'chainId',
@@ -75,7 +75,7 @@ const signature = {
     optional: []
   },
 
-  [signatureConstants.BlockDetails]: {
+  [serviceTypes.BlockDetails]: {
     mandatory: [
       {
         parameter: 'chainId',
@@ -89,7 +89,7 @@ const signature = {
     optional: []
   },
 
-  [signatureConstants.BlockDetailsExtended]: {
+  [serviceTypes.BlockDetailsExtended]: {
     mandatory: [
       {
         parameter: 'chainId',
@@ -103,7 +103,7 @@ const signature = {
     optional: []
   },
 
-  [signatureConstants.BlockTransactionHashes]: {
+  [serviceTypes.BlockTransactionHashes]: {
     mandatory: [
       {
         parameter: 'chainId',
@@ -117,7 +117,7 @@ const signature = {
     optional: []
   },
 
-  [signatureConstants.TransactionDetails]: {
+  [serviceTypes.TransactionDetails]: {
     mandatory: [
       {
         parameter: 'chainId',
@@ -131,7 +131,7 @@ const signature = {
     optional: ['transactionHashToShardIdentifierMap', 'consistentRead']
   },
 
-  [signatureConstants.TransactionExtendedDetails]: {
+  [serviceTypes.TransactionExtendedDetails]: {
     mandatory: [
       {
         parameter: 'chainId',
@@ -145,7 +145,7 @@ const signature = {
     optional: ['transactionHashToShardIdentifierMap', 'consistentRead']
   },
 
-  [signatureConstants.TransferDetails]: {
+  [serviceTypes.TransferDetails]: {
     mandatory: [
       {
         parameter: 'chainId',
@@ -159,7 +159,7 @@ const signature = {
     optional: ['transactionHashToShardIdentifierMap', 'consistentRead']
   },
 
-  [signatureConstants.AllTransferDetails]: {
+  [serviceTypes.AllTransferDetails]: {
     mandatory: [
       {
         parameter: 'chainId',
@@ -173,7 +173,7 @@ const signature = {
     optional: ['transactionHashToShardIdentifierMap', 'consistentRead']
   },
 
-  [signatureConstants.ContractAddressDetails]: {
+  [serviceTypes.ContractAddressDetails]: {
     mandatory: [
       {
         parameter: 'chainId',
@@ -187,7 +187,7 @@ const signature = {
     optional: []
   },
 
-  [signatureConstants.AddressBalance]: {
+  [serviceTypes.AddressBalance]: {
     mandatory: [
       {
         parameter: 'chainId',
@@ -205,7 +205,7 @@ const signature = {
     optional: []
   },
 
-  [signatureConstants.AddressTransactionHashes]: {
+  [serviceTypes.AddressTransactionHashes]: {
     mandatory: [
       {
         parameter: 'chainId',
@@ -223,7 +223,7 @@ const signature = {
     optional: ['nextPagePayload']
   },
 
-  [signatureConstants.AddressTransfers]: {
+  [serviceTypes.AddressTransfers]: {
     mandatory: [
       {
         parameter: 'chainId',
@@ -241,7 +241,7 @@ const signature = {
     optional: ['nextPagePayload']
   },
 
-  [signatureConstants.ChainBlocks]: {
+  [serviceTypes.ChainBlocks]: {
     mandatory: [
       {
         parameter: 'chainId',
@@ -251,7 +251,7 @@ const signature = {
     optional: []
   },
 
-  [signatureConstants.ChainTransactions]: {
+  [serviceTypes.ChainTransactions]: {
     mandatory: [
       {
         parameter: 'chainId',
@@ -261,7 +261,7 @@ const signature = {
     optional: []
   },
 
-  [signatureConstants.ReplaceShard]: {
+  [serviceTypes.ReplaceShard]: {
     mandatory: [
       {
         parameter: 'shardType',
@@ -279,7 +279,7 @@ const signature = {
     optional: []
   },
 
-  [signatureConstants.UpdateShard]: {
+  [serviceTypes.UpdateShard]: {
     mandatory: [
       {
         parameter: 'shardNumber',
@@ -301,7 +301,7 @@ const signature = {
     optional: []
   },
 
-  [signatureConstants.BlockChainIds]: {
+  [serviceTypes.BlockChainIds]: {
     mandatory: [
       {
         parameter: 'blockNumber',
@@ -311,7 +311,7 @@ const signature = {
     optional: []
   },
 
-  [signatureConstants.AddressBasicDetails]: {
+  [serviceTypes.AddressBasicDetails]: {
     mandatory: [
       {
         parameter: 'address',
@@ -325,7 +325,7 @@ const signature = {
     optional: []
   },
 
-  [signatureConstants.EconomyAggregator]: {
+  [serviceTypes.EconomyAggregator]: {
     mandatory: [
       {
         parameter: 'chainId',
@@ -339,7 +339,7 @@ const signature = {
     optional: []
   },
 
-  [signatureConstants.GetTokenHolders]: {
+  [serviceTypes.GetTokenHolders]: {
     mandatory: [
       {
         parameter: 'chainId',
@@ -353,7 +353,7 @@ const signature = {
     optional: ['nextPagePayload']
   },
 
-  [signatureConstants.CreateEconomy]: {
+  [serviceTypes.CreateEconomy]: {
     mandatory: [
       {
         parameter: 'chainId',
@@ -397,13 +397,13 @@ const signature = {
 };
 
 /**
- * Class for signature config
+ * Class for service signature
  *
  * @class
  */
-class Signature {
+class ServiceSignature {
   /**
-   * Constructor for signature config
+   * Constructor for service signature
    *
    * @constructor
    */
@@ -414,4 +414,4 @@ class Signature {
   }
 }
 
-module.exports = new Signature();
+module.exports = new ServiceSignature();

@@ -9,14 +9,14 @@ const rootPrefix = '../..',
   OSTBase = require('@openstfoundation/openst-base'),
   coreConstants = require(rootPrefix + '/config/coreConstants'),
   responseHelper = require(rootPrefix + '/lib/formatter/response'),
-  signatureConstants = require(rootPrefix + '/lib/globalConstant/signatureConstants');
+  serviceTypes = require(rootPrefix + '/lib/globalConstant/serviceTypes');
 
 const InstanceComposer = OSTBase.InstanceComposer;
 
 require(rootPrefix + '/lib/cacheManagement/chainSpecific/AddressBasicDetails');
 
 // Define serviceType for getting signature.
-const serviceType = signatureConstants.AddressBasicDetails;
+const serviceType = serviceTypes.AddressBasicDetails;
 
 class AddressBasicDetails extends ServicesBase {
   constructor(chainId, address) {

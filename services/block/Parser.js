@@ -11,12 +11,12 @@ const rootPrefix = '../..',
   coreConstants = require(rootPrefix + '/config/coreConstants'),
   logger = require(rootPrefix + '/lib/logger/customConsoleLogger'),
   responseHelper = require(rootPrefix + '/lib/formatter/response'),
-  signatureConstants = require(rootPrefix + '/lib/globalConstant/signatureConstants');
+  serviceTypes = require(rootPrefix + '/lib/globalConstant/serviceTypes');
 
 const InstanceComposer = OSTBase.InstanceComposer;
 
 // Define serviceType for getting signature.
-const serviceType = signatureConstants.BlockParser;
+const serviceType = serviceTypes.BlockParser;
 
 // Following require(s) for registering into instance composer
 require(rootPrefix + '/lib/formatter/config');

@@ -11,7 +11,7 @@ const rootPrefix = '../..',
   logger = require(rootPrefix + '/lib/logger/customConsoleLogger'),
   paginationLimits = require(rootPrefix + '/lib/globalConstant/paginationLimits'),
   responseHelper = require(rootPrefix + '/lib/formatter/response'),
-  signatureConstants = require(rootPrefix + '/lib/globalConstant/signatureConstants');
+  serviceTypes = require(rootPrefix + '/lib/globalConstant/serviceTypes');
 
 const InstanceComposer = OSTBase.InstanceComposer;
 
@@ -20,7 +20,7 @@ require(rootPrefix + '/lib/cacheManagement/shared/BlockTransactions');
 require(rootPrefix + '/lib/cacheMultiManagement/chainSpecific/BlockDataByBlockNumber');
 
 // Define serviceType for getting signature.
-const serviceType = signatureConstants.BlockTransactionHashes;
+const serviceType = serviceTypes.BlockTransactionHashes;
 
 /**
  * Class for getting block transactions service

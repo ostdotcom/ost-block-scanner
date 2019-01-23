@@ -1,8 +1,12 @@
-# openst-block-scanner
-Block scanner for ethereum-based block chains.
+# OpenST Block Scanner
+Parse any ethereum based blockchain and populate data in DynamoDB. Multiple chains are supported to be parsed and 
+processed data can be queried.
 
 
 ## Different shard types
+Parsed data is stored in multiple DynamoDB tables. Some data/entities are stored in shared tables and some data is 
+stored in shared tables. 
+
  *  Shared tables:
     * Chain table.
     * Shard table.

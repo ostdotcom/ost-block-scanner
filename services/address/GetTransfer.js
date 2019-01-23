@@ -11,7 +11,7 @@ const rootPrefix = '../..',
   responseHelper = require(rootPrefix + '/lib/formatter/response'),
   logger = require(rootPrefix + '/lib/logger/customConsoleLogger'),
   paginationLimits = require(rootPrefix + '/lib/globalConstant/paginationLimits'),
-  signatureConstants = require(rootPrefix + '/lib/globalConstant/signatureConstants');
+  serviceTypes = require(rootPrefix + '/lib/globalConstant/serviceTypes');
 
 const InstanceComposer = OSTBase.InstanceComposer;
 
@@ -21,7 +21,7 @@ require(rootPrefix + '/lib/models/sharded/byEconomyAddress/EconomyAddressTransfe
 require(rootPrefix + '/lib/cacheMultiManagement/shared/shardIdentifier/ByEconomyAddress');
 
 // Define serviceType for getting signature.
-const serviceType = signatureConstants.AddressTransfers;
+const serviceType = serviceTypes.AddressTransfers;
 
 /**
  * Class for getting transfers of a user
