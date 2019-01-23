@@ -17,8 +17,8 @@ require(rootPrefix + '/services/UpdateShard');
 program
   .option('--chainId <chainId>', 'Chain id')
   .option('--shardNumber <shardNumber>', 'Shard number')
-  .option('--shardPrefix <shardPrefix>', 'Number of block shards to be created')
-  .option('--isAvailable <isAvailable>', 'Number of economy shards to be created')
+  .option('--shardPrefix <shardPrefix>', 'Shard prefix of shards to be created')
+  .option('--isAvailable <isAvailable>', 'Is the shard available for allocation?')
   .option('--configFile <configFile>', 'Block scanner config strategy absolute file path')
   .parse(process.argv);
 
