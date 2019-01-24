@@ -4,20 +4,21 @@
  *
  * @module services/AddChain
  */
+const OSTBase = require('@openstfoundation/openst-base'),
+  InstanceComposer = OSTBase.InstanceComposer;
+
 const rootPrefix = '..',
   basicHelper = require(rootPrefix + '/helpers/basic'),
-  OSTBase = require('@openstfoundation/openst-base'),
   coreConstants = require(rootPrefix + '/config/coreConstants'),
   responseHelper = require(rootPrefix + '/lib/formatter/response'),
   logger = require(rootPrefix + '/lib/logger/customConsoleLogger'),
   errorConfig = basicHelper.getErrorConfig();
 
-const InstanceComposer = OSTBase.InstanceComposer;
-
 // Following require(s) for registering into instance composer
 require(rootPrefix + '/lib/models/shared/Chain');
 require(rootPrefix + '/services/shard/create/ByBlock');
 require(rootPrefix + '/services/shard/create/ByChainId');
+require(rootPrefix + '/lib/models/shared/ChainCronData');
 require(rootPrefix + '/services/shard/create/ByTransaction');
 require(rootPrefix + '/services/shard/create/ByEconomyAddress');
 require(rootPrefix + '/lib/models/shared/ChainCronData');

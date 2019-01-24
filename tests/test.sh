@@ -10,11 +10,6 @@ fi
 node tools/initialSetup.js --configFile $PWD'/tests/data/config.json'
 node tools/AddChain.js --chainId 1000 --networkId 1 --blockShardCount 2 --economyShardCount 2 --economyAddressShardCount 2 --transactionShardCount 2 --configFile $PWD'/tests/data/config.json'
 
-#start chain
-bash tests/data/geth/run-utility.sh &
-
-sleep 10
-
 # Run tests in order
 
 mocha tests/parser/checkBlockDetails.js --timeout 4000 --exit
