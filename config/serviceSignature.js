@@ -12,11 +12,11 @@ const signature = {
     mandatory: [
       {
         parameter: 'chainId',
-        error_identifier: 'missingChainId'
+        validatorMethod: 'validateInteger'
       },
       {
         parameter: 'shardNumber',
-        error_identifier: 'missingShardNumber'
+        validatorMethod: 'validateInteger'
       }
     ],
     optional: []
@@ -25,29 +25,32 @@ const signature = {
     mandatory: [
       {
         parameter: 'chainId',
-        error_identifier: 'missingChainId'
+        validatorMethod: 'validateInteger'
       }
     ],
-    optional: ['blockToProcess', 'blockDelay']
+    optional: [
+      { parameter: 'blockToProcess', validatorMethod: 'validateInteger' },
+      { parameter: 'blockDelay', validatorMethod: 'validateInteger' }
+    ]
   },
 
   [serviceTypes.TransactionParser]: {
     mandatory: [
       {
         parameter: 'chainId',
-        error_identifier: 'missingChainId'
+        validatorMethod: 'validateInteger'
       },
       {
         parameter: 'currentBlock',
-        error_identifier: 'missingBlockToProcess'
+        validatorMethod: 'validateObject'
       },
       {
         parameter: 'transactionHashes',
-        error_identifier: 'missingTransactionHashes'
+        validatorMethod: 'validateTransactionHashArray'
       },
       {
         parameter: 'nodesHavingBlock',
-        error_identifier: 'missingNodesHavingBlock'
+        validatorMethod: 'validateGethUrlsArray'
       }
     ],
     optional: []
@@ -57,19 +60,19 @@ const signature = {
     mandatory: [
       {
         parameter: 'chainId',
-        error_identifier: 'missingChainId'
+        validatorMethod: 'validateInteger'
       },
       {
         parameter: 'currentBlock',
-        error_identifier: 'missingBlockToProcess'
+        validatorMethod: 'validateObject'
       },
       {
         parameter: 'transactionReceipts',
-        error_identifier: 'missingTransactionReceipts'
+        validatorMethod: 'validateTransactionReceiptsObject'
       },
       {
         parameter: 'nodesHavingBlock',
-        error_identifier: 'missingNodesHavingBlock'
+        validatorMethod: 'validateGethUrlsArray'
       }
     ],
     optional: []
@@ -79,11 +82,11 @@ const signature = {
     mandatory: [
       {
         parameter: 'chainId',
-        error_identifier: 'missingChainId'
+        validatorMethod: 'validateInteger'
       },
       {
         parameter: 'blockNumbers',
-        error_identifier: 'missingBlockNumbers'
+        validatorMethod: 'validateIntegerArray'
       }
     ],
     optional: []
@@ -93,11 +96,11 @@ const signature = {
     mandatory: [
       {
         parameter: 'chainId',
-        error_identifier: 'missingChainId'
+        validatorMethod: 'validateInteger'
       },
       {
         parameter: 'blockNumbers',
-        error_identifier: 'missingBlockNumbers'
+        validatorMethod: 'validateIntegerArray'
       }
     ],
     optional: []
@@ -107,11 +110,11 @@ const signature = {
     mandatory: [
       {
         parameter: 'chainId',
-        error_identifier: 'missingChainId'
+        validatorMethod: 'validateInteger'
       },
       {
         parameter: 'blockNumber',
-        error_identifier: 'missingBlockNumber'
+        validatorMethod: 'validateInteger'
       }
     ],
     optional: []
@@ -121,67 +124,91 @@ const signature = {
     mandatory: [
       {
         parameter: 'chainId',
-        error_identifier: 'missingChainId'
+        validatorMethod: 'validateInteger'
       },
       {
         parameter: 'transactionHashes',
-        error_identifier: 'missingTransactionHashes'
+        validatorMethod: 'validateTransactionHashArray'
       }
     ],
-    optional: ['transactionHashToShardIdentifierMap', 'consistentRead']
+    optional: [
+      {
+        parameter: 'transactionHashToShardIdentifierMap',
+        validatorMethod: 'validateTransactionHashToShardIdentifierMap'
+      },
+      { parameter: 'consistentRead', validatorMethod: 'validateInteger' }
+    ]
   },
 
   [serviceTypes.TransactionExtendedDetails]: {
     mandatory: [
       {
         parameter: 'chainId',
-        error_identifier: 'missingChainId'
+        validatorMethod: 'validateInteger'
       },
       {
         parameter: 'transactionHashes',
-        error_identifier: 'missingTransactionHashes'
+        validatorMethod: 'validateTransactionHashArray'
       }
     ],
-    optional: ['transactionHashToShardIdentifierMap', 'consistentRead']
+    optional: [
+      {
+        parameter: 'transactionHashToShardIdentifierMap',
+        validatorMethod: 'validateTransactionHashToShardIdentifierMap'
+      },
+      { parameter: 'consistentRead', validatorMethod: 'validateInteger' }
+    ]
   },
 
   [serviceTypes.TransferDetails]: {
     mandatory: [
       {
         parameter: 'chainId',
-        error_identifier: 'missingChainId'
+        validatorMethod: 'validateInteger'
       },
       {
         parameter: 'transferIdentifiers',
-        error_identifier: 'missingTransferIdentifiers'
+        validatorMethod: 'validateTransferIdentifiers'
       }
     ],
-    optional: ['transactionHashToShardIdentifierMap', 'consistentRead']
+    optional: [
+      {
+        parameter: 'transactionHashToShardIdentifierMap',
+        validatorMethod: 'validateTransactionHashToShardIdentifierMap'
+      },
+      { parameter: 'consistentRead', validatorMethod: 'validateInteger' }
+    ]
   },
 
   [serviceTypes.AllTransferDetails]: {
     mandatory: [
       {
         parameter: 'chainId',
-        error_identifier: 'missingChainId'
+        validatorMethod: 'validateInteger'
       },
       {
         parameter: 'transactionHash',
-        error_identifier: 'missingTransactionHash'
+        validatorMethod: 'validateTransactionHash'
       }
     ],
-    optional: ['transactionHashToShardIdentifierMap', 'consistentRead']
+    optional: [
+      {
+        parameter: 'transactionHashToShardIdentifierMap',
+        validatorMethod: 'validateTransactionHashToShardIdentifierMap'
+      },
+      { parameter: 'consistentRead', validatorMethod: 'validateInteger' }
+    ]
   },
 
   [serviceTypes.ContractAddressDetails]: {
     mandatory: [
       {
         parameter: 'chainId',
-        error_identifier: 'missingChainId'
+        validatorMethod: 'validateInteger'
       },
       {
         parameter: 'contractAddresses',
-        error_identifier: 'missingContractAddresses'
+        validatorMethod: 'validateAddressesArray'
       }
     ],
     optional: []
@@ -191,15 +218,15 @@ const signature = {
     mandatory: [
       {
         parameter: 'chainId',
-        error_identifier: 'missingChainId'
+        validatorMethod: 'validateInteger'
       },
       {
         parameter: 'contractAddress',
-        error_identifier: 'missingContractAddress'
+        validatorMethod: 'validateEthAddress'
       },
       {
         parameter: 'userAddresses',
-        error_identifier: 'missingUserAddresses'
+        validatorMethod: 'validateAddressesArray'
       }
     ],
     optional: []
@@ -209,43 +236,43 @@ const signature = {
     mandatory: [
       {
         parameter: 'chainId',
-        error_identifier: 'missingChainId'
+        validatorMethod: 'validateInteger'
       },
       {
         parameter: 'contractAddress',
-        error_identifier: 'missingContractAddress'
+        validatorMethod: 'validateEthAddress'
       },
       {
         parameter: 'userAddress',
-        error_identifier: 'missingUserAddress'
+        validatorMethod: 'validateEthAddress'
       }
     ],
-    optional: ['nextPagePayload']
+    optional: [{ parameter: 'nextPagePayload', validatorMethod: 'validateNextPagePayload' }]
   },
 
   [serviceTypes.AddressTransfers]: {
     mandatory: [
       {
         parameter: 'chainId',
-        error_identifier: 'missingChainId'
+        validatorMethod: 'validateInteger'
       },
       {
         parameter: 'contractAddress',
-        error_identifier: 'missingContractAddress'
+        validatorMethod: 'validateEthAddress'
       },
       {
         parameter: 'userAddress',
-        error_identifier: 'missingUserAddress'
+        validatorMethod: 'validateEthAddress'
       }
     ],
-    optional: ['nextPagePayload']
+    optional: [{ parameter: 'nextPagePayload', validatorMethod: 'validateNextPagePayload' }]
   },
 
   [serviceTypes.ChainBlocks]: {
     mandatory: [
       {
         parameter: 'chainId',
-        error_identifier: 'missingChainId'
+        validatorMethod: 'validateInteger'
       }
     ],
     optional: []
@@ -255,7 +282,7 @@ const signature = {
     mandatory: [
       {
         parameter: 'chainId',
-        error_identifier: 'missingChainId'
+        validatorMethod: 'validateInteger'
       }
     ],
     optional: []
@@ -265,15 +292,15 @@ const signature = {
     mandatory: [
       {
         parameter: 'shardType',
-        error_identifier: 'missingShardType'
+        validatorMethod: 'validateShardType'
       },
       {
         parameter: 'chainId',
-        error_identifier: 'missingChainId'
+        validatorMethod: 'validateInteger'
       },
       {
         parameter: 'shardNumber',
-        error_identifier: 'missingShardNumber'
+        validatorMethod: 'validateInteger'
       }
     ],
     optional: []
@@ -283,19 +310,19 @@ const signature = {
     mandatory: [
       {
         parameter: 'shardNumber',
-        error_identifier: 'missingShardNumber'
+        validatorMethod: 'validateInteger'
       },
       {
         parameter: 'chainId',
-        error_identifier: 'missingChainId'
+        validatorMethod: 'validateInteger'
       },
       {
         parameter: 'shardPrefix',
-        error_identifier: 'missingShardPrefix'
+        validatorMethod: 'validateString'
       },
       {
         parameter: 'isAvailable',
-        error_identifier: 'missingIsAvailable'
+        validatorMethod: 'validateBoolean'
       }
     ],
     optional: []
@@ -305,7 +332,7 @@ const signature = {
     mandatory: [
       {
         parameter: 'blockNumber',
-        error_identifier: 'missingBlockNumber'
+        validatorMethod: 'validateInteger'
       }
     ],
     optional: []
@@ -315,11 +342,11 @@ const signature = {
     mandatory: [
       {
         parameter: 'address',
-        error_identifier: 'missingAddresses'
+        validatorMethod: 'validateEthAddress'
       },
       {
         parameter: 'chainId',
-        error_identifier: 'missingChainId'
+        validatorMethod: 'validateInteger'
       }
     ],
     optional: []
@@ -329,11 +356,11 @@ const signature = {
     mandatory: [
       {
         parameter: 'chainId',
-        error_identifier: 'missingChainId'
+        validatorMethod: 'validateInteger'
       },
       {
         parameter: 'blockNumber',
-        error_identifier: 'missingBlockNumber'
+        validatorMethod: 'validateInteger'
       }
     ],
     optional: []
@@ -343,53 +370,53 @@ const signature = {
     mandatory: [
       {
         parameter: 'chainId',
-        error_identifier: 'missingChainId'
+        validatorMethod: 'validateInteger'
       },
       {
         parameter: 'contractAddress',
-        error_identifier: 'missingContractAddress'
+        validatorMethod: 'validateEthAddress'
       }
     ],
-    optional: ['nextPagePayload']
+    optional: [{ parameter: 'nextPagePayload', validatorMethod: 'validateNextPagePayload' }]
   },
 
   [serviceTypes.CreateEconomy]: {
     mandatory: [
       {
         parameter: 'chainId',
-        error_identifier: 'missingChainId'
+        validatorMethod: 'validateInteger'
       },
       {
         parameter: 'contractAddress',
-        error_identifier: 'missingContractAddress'
+        validatorMethod: 'validateEthAddress'
       },
       {
         parameter: 'simpleStakeAddress',
-        error_identifier: 'missingSimpleStakeAddress'
+        validatorMethod: 'validateEthAddress'
       },
       {
         parameter: 'decimals',
-        error_identifier: 'missingDecimals'
+        validatorMethod: 'validateInteger'
       },
       {
         parameter: 'provider',
-        error_identifier: 'missingWeb3Provider'
+        validatorMethod: 'validateGethUrl'
       },
       {
         parameter: 'blockTimestamp',
-        error_identifier: 'missingBlockTimestamp'
+        validatorMethod: 'validateInteger'
       },
       {
         parameter: 'displayName',
-        error_identifier: 'missingDisplayName'
+        validatorMethod: 'validateDisplayName'
       },
       {
         parameter: 'conversionFactor',
-        error_identifier: 'missingConversionFactor'
+        validatorMethod: 'validateInteger'
       },
       {
         parameter: 'symbol',
-        error_identifier: 'missingSymbol'
+        validatorMethod: 'validateString'
       }
     ],
     optional: []

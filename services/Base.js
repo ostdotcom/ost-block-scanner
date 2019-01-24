@@ -6,9 +6,10 @@
  */
 const rootPrefix = '../',
   basicHelper = require(rootPrefix + '/helpers/basic'),
-  serviceSignature = require(rootPrefix + '/config/serviceSignature').getSignature(),
   responseHelper = require(rootPrefix + '/lib/formatter/response'),
-  logger = require(rootPrefix + '/lib/logger/customConsoleLogger');
+  logger = require(rootPrefix + '/lib/logger/customConsoleLogger'),
+  commonValidators = require(rootPrefix + '/lib/validators/common'),
+  serviceSignature = require(rootPrefix + '/config/serviceSignature').getSignature();
 
 const errorConfig = basicHelper.getErrorConfig();
 
@@ -36,6 +37,8 @@ class ServicesBaseKlass {
     if (params.options) {
       oThis.consistentRead = params.options.consistentRead || 0;
     }
+
+    oThis.paramsConfig = null;
   }
 
   /**
@@ -95,6 +98,8 @@ class ServicesBaseKlass {
     }
 
     await oThis._validateMandatoryParams();
+
+    await oThis._checkOptionalParams();
   }
 
   /**
@@ -110,16 +115,30 @@ class ServicesBaseKlass {
 
     let hasError = false;
 
-    for (let i = 0; i < mandatoryKeys.length; i++) {
-      let whiteListedKeyData = mandatoryKeys[i],
-        whiteListedKey = whiteListedKeyData.parameter;
+    for (let index = 0; index < mandatoryKeys.length; index++) {
+      let whiteListedKeyConfig = mandatoryKeys[index],
+        whiteListedKeyName = whiteListedKeyConfig.parameter;
 
       if (
-        !oThis.params.hasOwnProperty(whiteListedKey) ||
-        oThis.params[whiteListedKey] === undefined ||
-        oThis.params[whiteListedKey] === null
+        oThis.params.hasOwnProperty(whiteListedKeyName) &&
+        !commonValidators.isVarNull(oThis.params[whiteListedKeyName])
       ) {
-        paramErrors.push(whiteListedKeyData.error_identifier);
+        // Validate value as per method name passed in config
+        let valueToValidate = oThis.params[whiteListedKeyName],
+          validatorMethodName = whiteListedKeyConfig.validatorMethod,
+          validatorMethodInstance = commonValidators[validatorMethodName],
+          isValueValid = null;
+        if (!validatorMethodInstance) {
+          isValueValid = false;
+          logger.error(`${validatorMethodName} does not exist.`);
+        }
+        isValueValid = validatorMethodInstance.apply(commonValidators, [valueToValidate]);
+        if (!isValueValid) {
+          paramErrors.push(`invalid${oThis.firstLetterUppercase(whiteListedKeyName)}`);
+          hasError = true;
+        }
+      } else {
+        paramErrors.push(`missing${oThis.firstLetterUppercase(whiteListedKeyName)}`);
         hasError = true;
       }
     }
@@ -137,6 +156,69 @@ class ServicesBaseKlass {
     } else {
       return Promise.resolve(responseHelper.successWithData({}));
     }
+  }
+
+  /**
+   * Check optional params
+   *
+   * @private
+   *
+   * @return {result}
+   */
+  async _checkOptionalParams() {
+    const oThis = this,
+      optionalKeysConfig = oThis.paramsConfig.optional || [],
+      paramErrors = [];
+
+    let hasError = false;
+
+    for (let i = 0; i < optionalKeysConfig.length; i++) {
+      let optionalKeyConfig = optionalKeysConfig[i],
+        optionalKeyName = optionalKeyConfig.parameter;
+
+      if (oThis.params.hasOwnProperty(optionalKeyName) && commonValidators.isVarNull(oThis.params[optionalKeyName])) {
+        //validate value as per method name passed in config
+        let valueToValidate = oThis.params[optionalKeyName],
+          validatorMethodName = optionalKeyConfig.validatorMethod,
+          validatorMethodInstance = commonValidators[validatorMethodName],
+          isValueValid = null;
+        if (!validatorMethodInstance) {
+          isValueValid = false;
+          logger.error(`${validatorMethodName} does not exist.`);
+        }
+        isValueValid = validatorMethodInstance.apply(commonValidators, [valueToValidate]);
+
+        if (!isValueValid) {
+          paramErrors.push(`invalid_${optionalKeyName}`);
+          hasError = true;
+        }
+      }
+    }
+
+    if (hasError) {
+      return Promise.reject(
+        responseHelper.paramValidationError({
+          internal_error_identifier: 's_b_5',
+          api_error_identifier: 'invalid_api_params',
+          params_error_identifiers: paramErrors,
+          error_config: basicHelper.fetchErrorConfig(),
+          debug_options: {}
+        })
+      );
+    } else {
+      return Promise.resolve(responseHelper.successWithData({}));
+    }
+  }
+
+  /**
+   * Turn first letter of string to uppercase.
+   *
+   * @param {String} string
+   *
+   * @return {String}
+   */
+  firstLetterUppercase(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
   }
 
   /**
