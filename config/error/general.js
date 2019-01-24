@@ -15,11 +15,6 @@ const generalErrorConfig = {
     code: 'INTERNAL_SERVER_ERROR',
     message: 'Validations failed.'
   },
-  invalid_address: {
-    http_code: '400',
-    code: 'NOT_FOUND',
-    message: 'Invalid address.'
-  },
   ddb_batch_get_failed: {
     http_code: '422',
     code: 'UNPROCESSABLE_ENTITY',

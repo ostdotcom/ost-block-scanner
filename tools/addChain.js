@@ -4,13 +4,13 @@
  *
  * @module /tools/addChain
  */
-const rootPrefix = '..',
-  program = require('commander'),
+const program = require('commander'),
   OSTBase = require('@openstfoundation/openst-base'),
+  InstanceComposer = OSTBase.InstanceComposer;
+
+const rootPrefix = '..',
   coreConstants = require(rootPrefix + '/config/coreConstants'),
   logger = require(rootPrefix + '/lib/logger/customConsoleLogger');
-
-const InstanceComposer = OSTBase.InstanceComposer;
 
 require(rootPrefix + '/services/AddChain');
 
@@ -29,7 +29,7 @@ program.on('--help', () => {
   logger.log('  Example:');
   logger.log('');
   logger.log(
-    "    node tools/addChain.js --chainId 189 --networkId 1 --blockShardCount 1 --economyShardCount 1 --economyAddressShardCount 1 --transactionShardCount 1 --configFile './config.json'"
+    "    node tools/addChain.js --chainId 189 --networkId 1 --blockShardCount 1 --economyShardCount 1 --economyAddressShardCount 1 --transactionShardCount 1 --configFile './tests/data/config.json'"
   );
   logger.log('');
   logger.log('');

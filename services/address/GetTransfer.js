@@ -145,7 +145,7 @@ class GetAddressTransfer extends ServicesBase {
         return Promise.reject(
           responseHelper.error({
             internal_error_identifier: 's_a_gtf_2',
-            api_error_identifier: 'invalid_address',
+            api_error_identifier: 'invalidAddress',
             debug_options: { getShardRsp: getShardRsp }
           })
         );
