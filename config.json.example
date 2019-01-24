@@ -22,7 +22,7 @@
       "region": "localhost",
       "apiKey": "X",
       "apiSecret": "X",
-      "apiVersion": "2012-08-10",
+      "apiVersion": "2016-02-06",
       "enableSsl": "0"
     }
   },
@@ -50,7 +50,7 @@
           "region": "localhost",
           "apiKey": "X",
           "apiSecret": "X",
-          "apiVersion": "2012-08-10",
+          "apiVersion": "2016-02-06",
           "enableSsl": "0"
         }
       },
@@ -85,7 +85,7 @@
           "region": "localhost",
           "apiKey": "X",
           "apiSecret": "X",
-          "apiVersion": "2012-08-10",
+          "apiVersion": "2016-02-06",
           "enableSsl": "0"
         }
       },
