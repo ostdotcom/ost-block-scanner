@@ -149,7 +149,7 @@ class ServicesBaseKlass {
           internal_error_identifier: 's_b_4',
           api_error_identifier: 'invalidParams',
           params_error_identifiers: paramErrors,
-          error_config: basicHelper.getErrorConfig(),
+          error_config: errorConfig,
           debug_options: {}
         })
       );
@@ -176,7 +176,7 @@ class ServicesBaseKlass {
       let optionalKeyConfig = optionalKeysConfig[i],
         optionalKeyName = optionalKeyConfig.parameter;
 
-      if (oThis.params.hasOwnProperty(optionalKeyName) && commonValidators.isVarNull(oThis.params[optionalKeyName])) {
+      if (oThis.params.hasOwnProperty(optionalKeyName) && !commonValidators.isVarNull(oThis.params[optionalKeyName])) {
         //validate value as per method name passed in config
         let valueToValidate = oThis.params[optionalKeyName],
           validatorMethodName = optionalKeyConfig.validatorMethod,
@@ -189,7 +189,7 @@ class ServicesBaseKlass {
         isValueValid = validatorMethodInstance.apply(commonValidators, [valueToValidate]);
 
         if (!isValueValid) {
-          paramErrors.push(`invalid_${optionalKeyName}`);
+          paramErrors.push(`invalid${oThis.firstLetterUppercase(optionalKeyName)}`);
           hasError = true;
         }
       }
@@ -201,7 +201,7 @@ class ServicesBaseKlass {
           internal_error_identifier: 's_b_5',
           api_error_identifier: 'invalid_api_params',
           params_error_identifiers: paramErrors,
-          error_config: basicHelper.fetchErrorConfig(),
+          error_config: errorConfig,
           debug_options: {}
         })
       );
