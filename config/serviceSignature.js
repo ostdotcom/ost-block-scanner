@@ -318,7 +318,7 @@ const signature = {
       },
       {
         parameter: 'shardPrefix',
-        validatorMethod: 'validateString'
+        validatorMethod: 'validateShardType'
       },
       {
         parameter: 'isAvailable',
