@@ -4,15 +4,15 @@
  *
  * @module services/shard/Replace
  */
+const OSTBase = require('@openstfoundation/openst-base'),
+  InstanceComposer = OSTBase.InstanceComposer;
+
 const rootPrefix = '../..',
   ServicesBase = require(rootPrefix + '/services/Base'),
-  OSTBase = require('@openstfoundation/openst-base'),
   coreConstants = require(rootPrefix + '/config/coreConstants'),
   logger = require(rootPrefix + '/lib/logger/customConsoleLogger'),
-  shardTypeConstants = require(rootPrefix + '/lib/globalConstant/shardType'),
-  serviceTypes = require(rootPrefix + '/lib/globalConstant/serviceTypes');
-
-const InstanceComposer = OSTBase.InstanceComposer;
+  serviceTypes = require(rootPrefix + '/lib/globalConstant/serviceTypes'),
+  shardTypeConstants = require(rootPrefix + '/lib/globalConstant/shardType');
 
 // Following require(s) for registering into instance composer
 require(rootPrefix + '/services/UpdateShard');

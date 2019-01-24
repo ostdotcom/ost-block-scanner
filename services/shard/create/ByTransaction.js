@@ -4,19 +4,19 @@
  *
  * @module services/shard/create/ByTransaction
  */
+const OSTBase = require('@openstfoundation/openst-base'),
+  InstanceComposer = OSTBase.InstanceComposer;
+
 const rootPrefix = '../../..',
-  OSTBase = require('@openstfoundation/openst-base'),
   coreConstants = require(rootPrefix + '/config/coreConstants'),
   logger = require(rootPrefix + '/lib/logger/customConsoleLogger'),
-  CreateShardsBase = require(rootPrefix + '/services/shard/create/Base'),
-  cidPrefix = require(rootPrefix + '/lib/globalConstant/cidPrefix');
-
-const InstanceComposer = OSTBase.InstanceComposer;
+  cidPrefix = require(rootPrefix + '/lib/globalConstant/cidPrefix'),
+  CreateShardsBase = require(rootPrefix + '/services/shard/create/Base');
 
 require(rootPrefix + '/lib/models/shared/Shard');
 require(rootPrefix + '/lib/models/sharded/byTransaction/Transaction');
-require(rootPrefix + '/lib/models/sharded/byTransaction/TransactionDetail');
 require(rootPrefix + '/lib/models/sharded/byTransaction/TokenTransfer');
+require(rootPrefix + '/lib/models/sharded/byTransaction/TransactionDetail');
 
 /**
  * Class for shard by transaction service

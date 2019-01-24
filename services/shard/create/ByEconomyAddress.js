@@ -4,14 +4,14 @@
  *
  * @module services/shard/create/ByEconomyAddress
  */
+const OSTBase = require('@openstfoundation/openst-base'),
+  InstanceComposer = OSTBase.InstanceComposer;
+
 const rootPrefix = '../../..',
-  OSTBase = require('@openstfoundation/openst-base'),
   coreConstants = require(rootPrefix + '/config/coreConstants'),
   logger = require(rootPrefix + '/lib/logger/customConsoleLogger'),
-  CreateShardsBase = require(rootPrefix + '/services/shard/create/Base'),
-  cidPrefix = require(rootPrefix + '/lib/globalConstant/cidPrefix');
-
-const InstanceComposer = OSTBase.InstanceComposer;
+  cidPrefix = require(rootPrefix + '/lib/globalConstant/cidPrefix'),
+  CreateShardsBase = require(rootPrefix + '/services/shard/create/Base');
 
 require(rootPrefix + '/lib/models/shared/Shard');
 require(rootPrefix + '/lib/models/sharded/byEconomyAddress/EconomyAddressTransfer');
