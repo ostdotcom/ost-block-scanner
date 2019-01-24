@@ -16,7 +16,7 @@
     "apiVersion": "2012-08-10",
     "enableSsl": "0",
     "enableLogging": "0",
-    "enableAutoscaling": "0",
+    "enableAutoscaling": "1",
     "autoScaling": {
       "endpoint": "http://localhost:8000",
       "region": "localhost",
@@ -44,7 +44,7 @@
         "apiVersion": "2012-08-10",
         "enableSsl": "0",
         "enableLogging": "0",
-        "enableAutoscaling": "0",
+        "enableAutoscaling": "1",
         "autoScaling": {
           "endpoint": "http://localhost:8000",
           "region": "localhost",
@@ -79,7 +79,7 @@
         "apiVersion": "2012-08-10",
         "enableSsl": "0",
         "enableLogging": "0",
-        "enableAutoscaling": "0",
+        "enableAutoscaling": "1",
         "autoScaling": {
           "endpoint": "http://localhost:8000",
           "region": "localhost",
