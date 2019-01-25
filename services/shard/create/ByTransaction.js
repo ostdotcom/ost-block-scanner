@@ -4,19 +4,19 @@
  *
  * @module services/shard/create/ByTransaction
  */
+const OSTBase = require('@openstfoundation/openst-base'),
+  InstanceComposer = OSTBase.InstanceComposer;
+
 const rootPrefix = '../../..',
-  OSTBase = require('@openstfoundation/openst-base'),
   coreConstants = require(rootPrefix + '/config/coreConstants'),
   logger = require(rootPrefix + '/lib/logger/customConsoleLogger'),
-  CreateShardsBase = require(rootPrefix + '/services/shard/create/Base'),
-  shardPrefixConstants = require(rootPrefix + '/lib/globalConstant/shardPrefix');
-
-const InstanceComposer = OSTBase.InstanceComposer;
+  cidPrefix = require(rootPrefix + '/lib/globalConstant/cidPrefix'),
+  CreateShardsBase = require(rootPrefix + '/services/shard/create/Base');
 
 require(rootPrefix + '/lib/models/shared/Shard');
 require(rootPrefix + '/lib/models/sharded/byTransaction/Transaction');
-require(rootPrefix + '/lib/models/sharded/byTransaction/TransactionDetail');
 require(rootPrefix + '/lib/models/sharded/byTransaction/TokenTransfer');
+require(rootPrefix + '/lib/models/sharded/byTransaction/TransactionDetail');
 
 /**
  * Class for shard by transaction service
@@ -37,7 +37,7 @@ class ShardByTransaction extends CreateShardsBase {
 
     const oThis = this;
 
-    oThis.identifier = shardPrefixConstants.transaction + '_' + oThis.chainId;
+    oThis.identifier = cidPrefix.transaction + '_' + oThis.chainId;
   }
 
   /**

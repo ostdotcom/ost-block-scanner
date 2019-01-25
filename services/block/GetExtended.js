@@ -10,7 +10,7 @@ const rootPrefix = '../..',
   OSTBase = require('@openstfoundation/openst-base'),
   responseHelper = require(rootPrefix + '/lib/formatter/response'),
   logger = require(rootPrefix + '/lib/logger/customConsoleLogger'),
-  signatureConstants = require(rootPrefix + '/lib/globalConstant/signatureConstants');
+  serviceTypes = require(rootPrefix + '/lib/globalConstant/serviceTypes');
 
 const InstanceComposer = OSTBase.InstanceComposer;
 
@@ -18,7 +18,7 @@ const InstanceComposer = OSTBase.InstanceComposer;
 require(rootPrefix + '/lib/cacheMultiManagement/chainSpecific/BlockDataExtendedByBlockNumber');
 
 // Define serviceType for getting signature.
-const serviceType = signatureConstants.BlockDetailsExtended;
+const serviceType = serviceTypes.BlockDetailsExtended;
 
 /**
  * Class for block details service

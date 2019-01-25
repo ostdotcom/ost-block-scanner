@@ -39,7 +39,7 @@ describe('tests/parser/checkBlockDetails.js', async function() {
         transactionHashes = response.data.rawCurrentBlock.transactions;
 
       assert(true, response.success);
-      assert.deepEqual(keyArray.sort(), ['nextBlockToProcess', 'nodesWithBlock', 'rawCurrentBlock']);
+      assert.deepEqual(keyArray.sort(), ['currentBlock', 'nextBlockToProcess', 'nodesWithBlock', 'rawCurrentBlock']);
 
       let blockInfo = await shardByBlockModel.getBlock({
         chainId: chainId,

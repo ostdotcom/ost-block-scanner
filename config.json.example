@@ -16,13 +16,13 @@
     "apiVersion": "2012-08-10",
     "enableSsl": "0",
     "enableLogging": "0",
-    "enableAutoscaling": "0",
+    "enableAutoscaling": "1",
     "autoScaling": {
       "endpoint": "http://localhost:8000",
       "region": "localhost",
       "apiKey": "X",
       "apiSecret": "X",
-      "apiVersion": "2012-08-10",
+      "apiVersion": "2016-02-06",
       "enableSsl": "0"
     }
   },
@@ -44,13 +44,13 @@
         "apiVersion": "2012-08-10",
         "enableSsl": "0",
         "enableLogging": "0",
-        "enableAutoscaling": "0",
+        "enableAutoscaling": "1",
         "autoScaling": {
           "endpoint": "http://localhost:8000",
           "region": "localhost",
           "apiKey": "X",
           "apiSecret": "X",
-          "apiVersion": "2012-08-10",
+          "apiVersion": "2016-02-06",
           "enableSsl": "0"
         }
       },
@@ -79,13 +79,13 @@
         "apiVersion": "2012-08-10",
         "enableSsl": "0",
         "enableLogging": "0",
-        "enableAutoscaling": "0",
+        "enableAutoscaling": "1",
         "autoScaling": {
           "endpoint": "http://localhost:8000",
           "region": "localhost",
           "apiKey": "X",
           "apiSecret": "X",
-          "apiVersion": "2012-08-10",
+          "apiVersion": "2016-02-06",
           "enableSsl": "0"
         }
       },

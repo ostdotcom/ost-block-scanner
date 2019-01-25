@@ -11,7 +11,7 @@ const rootPrefix = '../..',
   responseHelper = require(rootPrefix + '/lib/formatter/response'),
   logger = require(rootPrefix + '/lib/logger/customConsoleLogger'),
   paginationLimits = require(rootPrefix + '/lib/globalConstant/paginationLimits'),
-  signatureConstants = require(rootPrefix + '/lib/globalConstant/signatureConstants');
+  serviceTypes = require(rootPrefix + '/lib/globalConstant/serviceTypes');
 
 const InstanceComposer = OSTBase.InstanceComposer;
 
@@ -21,7 +21,7 @@ require(rootPrefix + '/lib/models/sharded/byEconomyAddress/EconomyAddressTransac
 require(rootPrefix + '/lib/cacheMultiManagement/shared/shardIdentifier/ByEconomyAddress');
 
 // Define serviceType for getting signature.
-const serviceType = signatureConstants.AddressTransactionHashes;
+const serviceType = serviceTypes.AddressTransactionHashes;
 
 /**
  * Class for getting array of transaction hashes for a user
@@ -149,7 +149,7 @@ class GetAddressTransaction extends ServicesBase {
         return Promise.reject(
           responseHelper.error({
             internal_error_identifier: 's_a_gtx_2',
-            api_error_identifier: 'invalid_address',
+            api_error_identifier: 'invalidAddress',
             debug_options: { getShardRsp: getShardRsp }
           })
         );

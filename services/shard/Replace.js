@@ -4,15 +4,15 @@
  *
  * @module services/shard/Replace
  */
+const OSTBase = require('@openstfoundation/openst-base'),
+  InstanceComposer = OSTBase.InstanceComposer;
+
 const rootPrefix = '../..',
   ServicesBase = require(rootPrefix + '/services/Base'),
-  OSTBase = require('@openstfoundation/openst-base'),
   coreConstants = require(rootPrefix + '/config/coreConstants'),
   logger = require(rootPrefix + '/lib/logger/customConsoleLogger'),
-  shardTypeConstants = require(rootPrefix + '/lib/globalConstant/shardType'),
-  signatureConstants = require(rootPrefix + '/lib/globalConstant/signatureConstants');
-
-const InstanceComposer = OSTBase.InstanceComposer;
+  serviceTypes = require(rootPrefix + '/lib/globalConstant/serviceTypes'),
+  shardTypeConstants = require(rootPrefix + '/lib/globalConstant/shardType');
 
 // Following require(s) for registering into instance composer
 require(rootPrefix + '/services/UpdateShard');
@@ -23,7 +23,7 @@ require(rootPrefix + '/services/shard/create/ByEconomyAddress');
 require(rootPrefix + '/lib/cacheManagement/shared/AvailableShards');
 
 // Define serviceType for getting signature.
-const serviceType = signatureConstants.ReplaceShard;
+const serviceType = serviceTypes.ReplaceShard;
 
 /**
  * Class for creating a new shard

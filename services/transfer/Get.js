@@ -4,21 +4,21 @@
  *
  * @module services/transfer/Get
  */
+const OSTBase = require('@openstfoundation/openst-base'),
+  InstanceComposer = OSTBase.InstanceComposer;
+
 const rootPrefix = '../..',
   ServicesBase = require(rootPrefix + '/services/Base'),
-  OSTBase = require('@openstfoundation/openst-base'),
   coreConstants = require(rootPrefix + '/config/coreConstants'),
   responseHelper = require(rootPrefix + '/lib/formatter/response'),
   logger = require(rootPrefix + '/lib/logger/customConsoleLogger'),
-  signatureConstants = require(rootPrefix + '/lib/globalConstant/signatureConstants');
-
-const InstanceComposer = OSTBase.InstanceComposer;
+  serviceTypes = require(rootPrefix + '/lib/globalConstant/serviceTypes');
 
 // Following require(s) for registering into instance composer
 require(rootPrefix + '/lib/cacheMultiManagement/chainSpecific/TokenTransfer');
 
 // Define serviceType for getting signature.
-const serviceType = signatureConstants.TransferDetails;
+const serviceType = serviceTypes.TransferDetails;
 
 /**
  * Class for token transfer details service

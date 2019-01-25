@@ -6,10 +6,10 @@
  */
 const rootPrefix = '../../..',
   ServicesBase = require(rootPrefix + '/services/Base'),
-  signatureConstants = require(rootPrefix + '/lib/globalConstant/signatureConstants');
+  serviceTypes = require(rootPrefix + '/lib/globalConstant/serviceTypes');
 
 // Define serviceType for getting signature.
-const serviceType = signatureConstants.CreateShards;
+const serviceType = serviceTypes.CreateShards;
 
 /**
  * Base class for create shards

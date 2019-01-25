@@ -11,7 +11,7 @@ const rootPrefix = '../..',
   responseHelper = require(rootPrefix + '/lib/formatter/response'),
   logger = require(rootPrefix + '/lib/logger/customConsoleLogger'),
   paginationLimits = require(rootPrefix + '/lib/globalConstant/paginationLimits'),
-  signatureConstants = require(rootPrefix + '/lib/globalConstant/signatureConstants');
+  serviceTypes = require(rootPrefix + '/lib/globalConstant/serviceTypes');
 
 const InstanceComposer = OSTBase.InstanceComposer;
 
@@ -20,7 +20,7 @@ require(rootPrefix + '/lib/cacheManagement/chainSpecific/TransactionTokenTransfe
 require(rootPrefix + '/lib/cacheMultiManagement/shared/shardIdentifier/ByTransaction');
 
 // Define serviceType for getting signature.
-const serviceType = signatureConstants.AllTransferDetails;
+const serviceType = serviceTypes.AllTransferDetails;
 
 /**
  * Class for getting all token transfer details service

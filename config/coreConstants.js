@@ -31,14 +31,6 @@ class CoreConstants {
     return process.env.OST_DEBUG_ENABLED;
   }
 
-  /**
-   * Web3 pool size
-   *
-   * @returns {*}
-   */
-  get OST_WEB3_POOL_SIZE() {
-    return process.env.OST_WEB3_POOL_SIZE;
-  }
 
   /**
    * Error config
@@ -61,14 +53,6 @@ class CoreConstants {
     return 'openst-block-scanner';
   }
 
-  /**
-   * Batch delete retry count
-   *
-   * @return {Number}
-   */
-  get batchDeleteRetryCount() {
-    return 10;
-  }
 }
 
 module.exports = new CoreConstants();

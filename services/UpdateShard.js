@@ -13,14 +13,14 @@ const rootPrefix = '..',
   coreConstants = require(rootPrefix + '/config/coreConstants'),
   responseHelper = require(rootPrefix + '/lib/formatter/response'),
   logger = require(rootPrefix + '/lib/logger/customConsoleLogger'),
-  shardPrefixConstants = require(rootPrefix + '/lib/globalConstant/shardPrefix'),
-  signatureConstants = require(rootPrefix + '/lib/globalConstant/signatureConstants');
+  cidPrefix = require(rootPrefix + '/lib/globalConstant/cidPrefix'),
+  serviceTypes = require(rootPrefix + '/lib/globalConstant/serviceTypes');
 
 // Following require(s) for registering into instance composer
 require(rootPrefix + '/lib/models/shared/Shard');
 
 // Define serviceType for getting signature.
-const serviceType = signatureConstants.UpdateShard;
+const serviceType = serviceTypes.UpdateShard;
 
 /**
  * Class for update shard service.
@@ -49,7 +49,7 @@ class UpdateShard extends ServicesBase {
     oThis.shardNumber = shardNumber;
     oThis.isAvailable = isAvailable;
 
-    oThis.identifier = shardPrefixConstants[shardPrefix] + '_' + chainId;
+    oThis.identifier = cidPrefix[shardPrefix] + '_' + chainId;
   }
 
   /**

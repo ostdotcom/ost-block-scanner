@@ -10,13 +10,13 @@ const OSTBase = require('@openstfoundation/openst-base'),
 const rootPrefix = '../..',
   ServicesBase = require(rootPrefix + '/services/Base'),
   coreConstants = require(rootPrefix + '/config/coreConstants'),
-  signatureConstants = require(rootPrefix + '/lib/globalConstant/signatureConstants');
+  serviceTypes = require(rootPrefix + '/lib/globalConstant/serviceTypes');
 
 // Following require(s) for registering into instance composer
 require(rootPrefix + '/lib/transactionParser/CreateEconomy');
 
 // Define serviceType for getting signature.
-const serviceType = signatureConstants.CreateEconomy;
+const serviceType = serviceTypes.CreateEconomy;
 
 /**
  * Class for creating a new economy.

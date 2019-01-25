@@ -10,7 +10,7 @@ const rootPrefix = '../..',
   coreConstants = require(rootPrefix + '/config/coreConstants'),
   responseHelper = require(rootPrefix + '/lib/formatter/response'),
   logger = require(rootPrefix + '/lib/logger/customConsoleLogger'),
-  signatureConstants = require(rootPrefix + '/lib/globalConstant/signatureConstants');
+  serviceTypes = require(rootPrefix + '/lib/globalConstant/serviceTypes');
 
 const InstanceComposer = OSTBase.InstanceComposer;
 
@@ -18,7 +18,7 @@ const InstanceComposer = OSTBase.InstanceComposer;
 require(rootPrefix + '/lib/cacheMultiManagement/chainSpecific/Transaction');
 
 // Define serviceType for getting signature.
-const serviceType = signatureConstants.TransactionDetails;
+const serviceType = serviceTypes.TransactionDetails;
 
 /**
  * Class for transaction details service

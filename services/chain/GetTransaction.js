@@ -11,7 +11,7 @@ const rootPrefix = '../..',
   responseHelper = require(rootPrefix + '/lib/formatter/response'),
   logger = require(rootPrefix + '/lib/logger/customConsoleLogger'),
   paginationLimits = require(rootPrefix + '/lib/globalConstant/paginationLimits'),
-  signatureConstants = require(rootPrefix + '/lib/globalConstant/signatureConstants');
+  serviceTypes = require(rootPrefix + '/lib/globalConstant/serviceTypes');
 
 const InstanceComposer = OSTBase.InstanceComposer;
 
@@ -20,7 +20,7 @@ require(rootPrefix + '/lib/models/shared/ShardByTransaction');
 require(rootPrefix + '/lib/cacheManagement/shared/RecentTransactionsByChain');
 
 // Define serviceType for getting signature.
-const serviceType = signatureConstants.ChainTransactions;
+const serviceType = serviceTypes.ChainTransactions;
 
 /**
  * Class for chain transactions service

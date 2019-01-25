@@ -142,7 +142,6 @@ class DataAggregator {
       oThis.blockToProcess = parseInt(chainDataResp[oThis.chainId.toString()].lastAggregatedBlock) + 1;
     }
 
-    // TODO:: Change this code once finalized block comes
     let ShardByBlockModel = instanceComposer.getShadowedClassFor(coreConstants.icNameSpace, 'ShardByBlockModel'),
       response = await new ShardByBlockModel({
         consistentRead: 0
