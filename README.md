@@ -90,11 +90,3 @@ stored in shared tables.
     export CONFIG_STRATEGY_PATH=$(pwd)/config.json
     node executables/blockScanner.js --chainId 1000 --configFile $CONFIG_STRATEGY_PATH --startBlockNumber 0 --endBlockNumber 100
     ```
-    
-## Running tests
-* Start Dynamo
-
-    ```bash
-    java -Djava.library.path=~/dynamodb_local_latest/DynamoDBLocal_lib/ -jar ~/dynamodb_local_latest/DynamoDBLocal.jar -sharedDb -dbPath .
-    ```
-* Run tests with `npm test`.
