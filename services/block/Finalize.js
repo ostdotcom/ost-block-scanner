@@ -172,7 +172,8 @@ class Finalize {
     let fetchBlockTransactions = new FetchBlockTransactions(
       oThis.chainId,
       oThis.blockToProcess,
-      oThis.currentBlockInfo.timestamp
+      oThis.currentBlockInfo.timestamp,
+      false
     );
 
     let response = await fetchBlockTransactions.perform();
