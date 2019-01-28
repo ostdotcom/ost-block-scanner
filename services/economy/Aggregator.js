@@ -96,7 +96,7 @@ class EconomyAggregator extends ServiceBase {
 
     // Fetch transactions and transfers of block
     let fetchTrxKlass = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'FetchBlockTransactions'),
-      fetchTrxResp = await new fetchTrxKlass(oThis.chainId, oThis.blockNumber, oThis.blockTimestamp).perform();
+      fetchTrxResp = await new fetchTrxKlass(oThis.chainId, oThis.blockNumber, oThis.blockTimestamp, true).perform();
 
     if (
       fetchTrxResp.isFailure() ||
