@@ -56,13 +56,56 @@ class Finalize {
    *
    */
   async asyncPerform() {
-    const oThis = this,
-      CheckIfBlockProcessable = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'CheckIfBlockProcessable');
+    const oThis = this;
 
     oThis.revertedBlock = false;
 
     let blockToProcess = await oThis.getBlockToFinalize();
 
+    let resp = await oThis.validateBlockToProcess(blockToProcess);
+
+    if (resp.data.blockProcessable) {
+      resp = await oThis.finalizeBlock();
+    }
+
+    if (resp.isSuccess()) {
+      return responseHelper.successWithData(resp.data);
+    } else {
+      return responseHelper.error({
+        internal_error_identifier: 's_f_f_2',
+        api_error_identifier: 'something_went_wrong',
+        debug_options: resp.err,
+        error_config: errorConfig
+      });
+    }
+  }
+
+  /**
+   * getBlockToFinalize
+   *
+   * @return {Promise}
+   */
+  async getBlockToFinalize() {
+    const oThis = this,
+      ChainCronDataModel = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'ChainCronDataModel'),
+      chainCronDataObj = new ChainCronDataModel({});
+
+    let cronDataRsp = await chainCronDataObj.getCronData(oThis.chainId);
+
+    return parseInt(cronDataRsp[oThis.chainId]['lastFinalizedBlock']) + 1;
+  }
+
+  /**
+   * Validate whether block is processable or not.
+   *
+   * @return {Promise}
+   */
+  async validateBlockToProcess(blockToProcess) {
+    const oThis = this;
+
+    const CheckIfBlockProcessable = oThis
+      .ic()
+      .getShadowedClassFor(coreConstants.icNameSpace, 'CheckIfBlockProcessable');
     let checkIfBlockProcessable = new CheckIfBlockProcessable({
       chainId: oThis.chainId,
       blockToProcess: blockToProcess,
@@ -72,12 +115,23 @@ class Finalize {
     let checkIfBlockProcessableRsp = await checkIfBlockProcessable.perform();
 
     if (!checkIfBlockProcessableRsp.data.blockProcessable) {
-      return Promise.resolve(checkIfBlockProcessableRsp);
+      return responseHelper.successWithData({ blockProcessable: false });
     }
 
     // This represents block information from Chain.
     oThis.currentBlockInfo = checkIfBlockProcessableRsp.data.blockInfo;
     oThis.blockToProcess = blockToProcess;
+
+    return responseHelper.successWithData({ blockProcessable: true });
+  }
+
+  /**
+   * Finalize block by checking Chain v/s Dynamo data
+   *
+   * @return {Promise}
+   */
+  async finalizeBlock() {
+    const oThis = this;
 
     await oThis.checkBlockData();
 
@@ -99,21 +153,6 @@ class Finalize {
       blockProcessable: true,
       processedTransactions: oThis.currentBlockInfo.transactions
     });
-  }
-
-  /**
-   * getBlockToFinalize
-   *
-   * @return {Promise}
-   */
-  async getBlockToFinalize() {
-    const oThis = this,
-      ChainCronDataModel = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'ChainCronDataModel'),
-      chainCronDataObj = new ChainCronDataModel({});
-
-    let cronDataRsp = await chainCronDataObj.getCronData(oThis.chainId);
-
-    return parseInt(cronDataRsp[oThis.chainId]['lastFinalizedBlock']) + 1;
   }
 
   /**
@@ -249,7 +288,7 @@ class Finalize {
 
     let distributeTransactions = new DistributeTransactions({
       chainId: oThis.chainId,
-      rawCurrentBlock: blockParserData.rawCurrentBlock,
+      rawCurrentBlock: oThis.currentBlockInfo,
       nodesWithBlock: blockParserData.nodesWithBlock
     });
 
