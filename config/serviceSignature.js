@@ -412,7 +412,7 @@ const signature = {
       },
       {
         parameter: 'conversionFactor',
-        validatorMethod: 'validateInteger'
+        validatorMethod: 'validateFloat'
       },
       {
         parameter: 'symbol',
