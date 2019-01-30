@@ -64,16 +64,12 @@ class Finalize {
 
     let resp = await oThis.validateBlockToProcess(blockToProcess);
 
-    if (resp.isSuccess()) {
+    if (resp.data.blockProcessable) {
       resp = await oThis.finalizeBlock();
     }
 
-    if (resp.isSuccess) {
-      return responseHelper.successWithData({
-        processedBlock: oThis.blockToProcess,
-        blockProcessable: true,
-        processedTransactions: oThis.currentBlockInfo.transactions
-      });
+    if (resp.isSuccess()) {
+      return responseHelper.successWithData(resp.data);
     } else {
       return responseHelper.error({
         internal_error_identifier: 's_f_f_2',
@@ -99,6 +95,11 @@ class Finalize {
     return parseInt(cronDataRsp[oThis.chainId]['lastFinalizedBlock']) + 1;
   }
 
+  /**
+   * Validate whether block is processable or not.
+   *
+   * @return {Promise}
+   */
   async validateBlockToProcess(blockToProcess) {
     const oThis = this;
 
@@ -114,21 +115,21 @@ class Finalize {
     let checkIfBlockProcessableRsp = await checkIfBlockProcessable.perform();
 
     if (!checkIfBlockProcessableRsp.data.blockProcessable) {
-      return responseHelper.error({
-        internal_error_identifier: 's_b_f_1',
-        api_error_identifier: 'something_went_wrong',
-        debug_options: 'Block is not processable.',
-        error_config: {}
-      });
+      return responseHelper.successWithData({ blockProcessable: false });
     }
 
     // This represents block information from Chain.
     oThis.currentBlockInfo = checkIfBlockProcessableRsp.data.blockInfo;
     oThis.blockToProcess = blockToProcess;
 
-    return responseHelper.successWithData(checkIfBlockProcessableRsp.data);
+    return responseHelper.successWithData({ blockProcessable: true });
   }
 
+  /**
+   * Finalize block by checking Chain v/s Dynamo data
+   *
+   * @return {Promise}
+   */
   async finalizeBlock() {
     const oThis = this;
 
@@ -147,7 +148,11 @@ class Finalize {
       }
     }
 
-    return responseHelper.successWithData({});
+    return responseHelper.successWithData({
+      processedBlock: oThis.blockToProcess,
+      blockProcessable: true,
+      processedTransactions: oThis.currentBlockInfo.transactions
+    });
   }
 
   /**
@@ -283,7 +288,7 @@ class Finalize {
 
     let distributeTransactions = new DistributeTransactions({
       chainId: oThis.chainId,
-      rawCurrentBlock: blockParserData.rawCurrentBlock,
+      rawCurrentBlock: oThis.currentBlockInfo,
       nodesWithBlock: blockParserData.nodesWithBlock
     });
 
