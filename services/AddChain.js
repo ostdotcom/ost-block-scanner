@@ -62,7 +62,7 @@ class AddChain {
   perform() {
     const oThis = this;
 
-    oThis.asyncPerform().catch(function(err) {
+    return oThis.asyncPerform().catch(function(err) {
       logger.error(' In catch block of services/AddChain.js');
       return responseHelper.error({
         internal_error_identifier: 's_ac_1',
