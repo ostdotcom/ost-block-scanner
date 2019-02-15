@@ -69,6 +69,7 @@ require(rootPrefix + '/services/transfer/Parser');
 require(rootPrefix + '/lib/cacheMultiManagement/shared/shardIdentifier/ByEconomyAddress');
 require(rootPrefix + '/lib/cacheManagement/chainSpecific/EconomyAddressTransfer');
 require(rootPrefix + '/lib/cacheMultiManagement/shared/Economy');
+require(rootPrefix + '/lib/cacheMultiManagement/chainSpecific/PendingTransaction');
 
 require(rootPrefix + '/services/economy/Create');
 require(rootPrefix + '/services/economy/Aggregator');
@@ -191,6 +192,10 @@ class OpenSTBlockScanner {
       'EconomyAddressTransferCache'
     );
     cache.Economy = instanceComposer.getShadowedClassFor(coreConstants.icNameSpace, 'EconomyCache');
+    cache.PendingTransaction = instanceComposer.getShadowedClassFor(
+      coreConstants.icNameSpace,
+      'PendingTransactionCache'
+    );
   }
 }
 
