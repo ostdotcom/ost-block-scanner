@@ -66,10 +66,11 @@ require(rootPrefix + '/services/transfer/GetAll');
 require(rootPrefix + '/services/transfer/Parser');
 
 //Cache
+require(rootPrefix + '/lib/cacheMultiManagement/shared/Economy');
 require(rootPrefix + '/lib/cacheMultiManagement/shared/shardIdentifier/ByEconomyAddress');
 require(rootPrefix + '/lib/cacheManagement/chainSpecific/EconomyAddressTransfer');
-require(rootPrefix + '/lib/cacheMultiManagement/shared/Economy');
-require(rootPrefix + '/lib/cacheMultiManagement/chainSpecific/PendingTransaction');
+require(rootPrefix + '/lib/cacheMultiManagement/chainSpecific/PendingTransactionByHash');
+require(rootPrefix + '/lib/cacheMultiManagement/chainSpecific/PendingTransactionByUuid');
 
 require(rootPrefix + '/services/economy/Create');
 require(rootPrefix + '/services/economy/Aggregator');
@@ -192,9 +193,13 @@ class OpenSTBlockScanner {
       'EconomyAddressTransferCache'
     );
     cache.Economy = instanceComposer.getShadowedClassFor(coreConstants.icNameSpace, 'EconomyCache');
-    cache.PendingTransaction = instanceComposer.getShadowedClassFor(
+    cache.PendingTransactionByHash = instanceComposer.getShadowedClassFor(
       coreConstants.icNameSpace,
-      'PendingTransactionCache'
+      'PendingTransactionByHashCache'
+    );
+    cache.PendingTransactionByUuid = instanceComposer.getShadowedClassFor(
+      coreConstants.icNameSpace,
+      'PendingTransactionByUuidCache'
     );
   }
 }
