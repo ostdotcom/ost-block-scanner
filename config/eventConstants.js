@@ -1,4 +1,3 @@
-'use strict';
 /**
  * Load all the event constants.
  *
@@ -9,18 +8,11 @@
  * Class for event constants
  *
  * @class
- *
  */
 class EventConstants {
   /**
-   * Constructor for event constants
-   *
-   * @constructor
-   */
-  constructor() {}
-
-  /**
    * Get transfer event.
+   *
    * @returns {string}
    */
   get transferEvent() {
@@ -29,6 +21,7 @@ class EventConstants {
 
   /**
    * Get mintProgressed event.
+   *
    * @returns {string}
    */
   get mintProgressedEvent() {
@@ -37,6 +30,7 @@ class EventConstants {
 
   /**
    * Get mintProgressed event.
+   *
    * @returns {string}
    */
   get redeemProgressedEvent() {
@@ -50,16 +44,15 @@ class EventConstants {
    */
   getAllEvents() {
     const oThis = this;
-    let eventsName = [];
-    eventsName.push(oThis.mintProgressedEvent);
-    eventsName.push(oThis.redeemProgressedEvent);
-    return eventsName;
+
+    return [oThis.mintProgressedEvent, oThis.redeemProgressedEvent];
   }
 
   /**
    * Method signature for transfer event
    *
-   * @returns {string}
+   * @returns {String}
+   *
    * @private
    */
   get _transferEventSignature() {
@@ -69,7 +62,8 @@ class EventConstants {
   /**
    * Method signature for MintProgressed event
    *
-   * @returns {string}
+   * @returns {String}
+   *
    * @private
    */
   get _mintProgressedEventSignature() {
@@ -79,7 +73,8 @@ class EventConstants {
   /**
    * Method signature for RedeemProgressed event
    *
-   * @returns {string}
+   * @returns {String}
+   *
    * @private
    */
   get _redeemProgressedEventSignature() {
@@ -93,9 +88,8 @@ class EventConstants {
    */
   getParsableSignatures() {
     const oThis = this;
-    let signaturesArray = [];
-    signaturesArray.push(oThis._transferEventSignature);
-    return signaturesArray;
+
+    return [oThis._transferEventSignature];
   }
 
   /**
@@ -105,12 +99,8 @@ class EventConstants {
    */
   getAllSignatures() {
     const oThis = this;
-    let signaturesArray = [];
-    signaturesArray.push(oThis._transferEventSignature);
-    signaturesArray.push(oThis._mintProgressedEventSignature);
-    signaturesArray.push(oThis._redeemProgressedEventSignature);
 
-    return signaturesArray;
+    return [oThis._transferEventSignature, oThis._mintProgressedEventSignature, oThis._redeemProgressedEventSignature];
   }
 
   /**
@@ -119,14 +109,13 @@ class EventConstants {
    * @returns {Object}
    */
   eventSignatureToName() {
-    const oThis = this,
-      eventSignatureToNameMap = {};
+    const oThis = this;
 
-    eventSignatureToNameMap[oThis._transferEventSignature] = oThis.transferEvent;
-    eventSignatureToNameMap[oThis._mintProgressedEventSignature] = oThis.mintProgressedEvent;
-    eventSignatureToNameMap[oThis._redeemProgressedEventSignature] = oThis.redeemProgressedEvent;
-
-    return eventSignatureToNameMap;
+    return {
+      [oThis._transferEventSignature]: oThis.transferEvent,
+      [oThis._mintProgressedEventSignature]: oThis.mintProgressedEvent,
+      [oThis._redeemProgressedEventSignature]: oThis.redeemProgressedEvent
+    };
   }
 }
 

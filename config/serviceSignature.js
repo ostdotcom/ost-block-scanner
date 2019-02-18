@@ -1,9 +1,9 @@
-'use strict';
 /**
  * Load all the service signature constants.
  *
  * @module config/serviceSignature
  */
+
 const rootPrefix = '..',
   serviceTypes = require(rootPrefix + '/lib/globalConstant/serviceTypes');
 
@@ -429,13 +429,6 @@ const signature = {
  * @class
  */
 class ServiceSignature {
-  /**
-   * Constructor for service signature
-   *
-   * @constructor
-   */
-  constructor() {}
-
   getSignature() {
     return signature;
   }

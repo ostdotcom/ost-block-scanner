@@ -4,8 +4,11 @@
  *
  * @module services/transfer/Parser
  */
+
+const OSTBase = require('@openstfoundation/openst-base'),
+  InstanceComposer = OSTBase.InstanceComposer;
+
 const rootPrefix = '../..',
-  OSTBase = require('@openstfoundation/openst-base'),
   ServiceBase = require(rootPrefix + '/services/Base'),
   basicHelper = require(rootPrefix + '/helpers/basic'),
   coreConstants = require(rootPrefix + '/config/coreConstants'),
@@ -14,20 +17,18 @@ const rootPrefix = '../..',
   serviceTypes = require(rootPrefix + '/lib/globalConstant/serviceTypes'),
   formatTransactionLogs = require(rootPrefix + '/lib/transactionParser/formatTransactionLogs');
 
-const InstanceComposer = OSTBase.InstanceComposer;
-
 // Define serviceType for getting signature.
 const serviceType = serviceTypes.TokenTransferParser;
 
 const errorConfig = basicHelper.getErrorConfig();
 
 require(rootPrefix + '/lib/transactionParser/CreateEconomy');
-require(rootPrefix + '/lib/models/sharded/byTransaction/TokenTransfer');
-require(rootPrefix + '/lib/economyAddresses/WriteEconomyAddressTransfers');
-require(rootPrefix + '/lib/cacheMultiManagement/shared/shardIdentifier/ByTransaction');
 require(rootPrefix + '/lib/cacheMultiManagement/shared/Economy');
 require(rootPrefix + '/lib/transactionParser/SumUserTokenBalances');
+require(rootPrefix + '/lib/models/sharded/byTransaction/TokenTransfer');
+require(rootPrefix + '/lib/economyAddresses/WriteEconomyAddressTransfers');
 require(rootPrefix + '/lib/cacheMultiManagement/chainSpecific/TokenTransfer');
+require(rootPrefix + '/lib/cacheMultiManagement/shared/shardIdentifier/ByTransaction');
 
 /**
  * Class for token transfer parser
