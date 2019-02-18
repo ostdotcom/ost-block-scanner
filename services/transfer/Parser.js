@@ -4,17 +4,18 @@
  *
  * @module services/transfer/Parser
  */
+
+const OSTBase = require('@openstfoundation/openst-base'),
+  InstanceComposer = OSTBase.InstanceComposer;
+
 const rootPrefix = '../..',
-  OSTBase = require('@openstfoundation/openst-base'),
   ServiceBase = require(rootPrefix + '/services/Base'),
   basicHelper = require(rootPrefix + '/helpers/basic'),
   coreConstants = require(rootPrefix + '/config/coreConstants'),
   logger = require(rootPrefix + '/lib/logger/customConsoleLogger'),
   responseHelper = require(rootPrefix + '/lib/formatter/response'),
   serviceTypes = require(rootPrefix + '/lib/globalConstant/serviceTypes'),
-  formatTransactionLogs = require(rootPrefix + '/lib/transactionParser/formatTransactionLogs');
-
-const InstanceComposer = OSTBase.InstanceComposer;
+  FormatTransactionLogs = require(rootPrefix + '/lib/transactionParser/formatTransactionLogs');
 
 // Define serviceType for getting signature.
 const serviceType = serviceTypes.TokenTransferParser;
@@ -22,12 +23,12 @@ const serviceType = serviceTypes.TokenTransferParser;
 const errorConfig = basicHelper.getErrorConfig();
 
 require(rootPrefix + '/lib/transactionParser/CreateEconomy');
-require(rootPrefix + '/lib/models/sharded/byTransaction/TokenTransfer');
-require(rootPrefix + '/lib/economyAddresses/WriteEconomyAddressTransfers');
-require(rootPrefix + '/lib/cacheMultiManagement/shared/shardIdentifier/ByTransaction');
 require(rootPrefix + '/lib/cacheMultiManagement/shared/Economy');
 require(rootPrefix + '/lib/transactionParser/SumUserTokenBalances');
+require(rootPrefix + '/lib/models/sharded/byTransaction/TokenTransfer');
+require(rootPrefix + '/lib/economyAddresses/WriteEconomyAddressTransfers');
 require(rootPrefix + '/lib/cacheMultiManagement/chainSpecific/TokenTransfer');
+require(rootPrefix + '/lib/cacheMultiManagement/shared/shardIdentifier/ByTransaction');
 
 /**
  * Class for token transfer parser
@@ -67,6 +68,7 @@ class TokenTransferParser extends ServiceBase {
     oThis.insertionFailedTransactions = [];
     oThis.transferContractAddresses = {};
     oThis.refreshEconomies = {};
+    oThis.economyRefreshTransactions = {};
     oThis.nodesHavingBlock = nodesHavingBlock;
   }
 
@@ -170,11 +172,14 @@ class TokenTransferParser extends ServiceBase {
     for (let txHash in oThis.transactionReceiptMap) {
       let trxReceipt = oThis.transactionReceiptMap[txHash];
 
-      let formattedTrxLogResp = new formatTransactionLogs(trxReceipt).perform();
+      let formattedTrxLogResp = new FormatTransactionLogs(trxReceipt).perform();
       if (formattedTrxLogResp.isSuccess() && formattedTrxLogResp.data['tokenTransfers'].length > 0) {
         oThis.tokenTransfersMap[txHash] = formattedTrxLogResp.data['tokenTransfers'];
         oThis.transactionReceiptMap[txHash]['tokenTransferIndices'] =
           formattedTrxLogResp.data['transactionTransferIndices'];
+      }
+      if (formattedTrxLogResp.isSuccess() && formattedTrxLogResp.data['refreshEconomy']) {
+        oThis.economyRefreshTransactions[txHash] = 1;
       }
     }
 
@@ -320,9 +325,6 @@ class TokenTransferParser extends ServiceBase {
       for (let j = 0; j < tokenTransfers.length; j++) {
         let transfer = tokenTransfers[j];
         oThis.transferContractAddresses[transfer.contractAddress] = 1;
-        if (transfer.refreshEconomyDetails && transfer.refreshEconomyDetails === 1) {
-          oThis.refreshEconomies[transfer.contractAddress] = 1;
-        }
         insertParams[shardId].push({
           transactionHash: trHash,
           eventIndex: transfer.eventIndex,
@@ -332,6 +334,9 @@ class TokenTransferParser extends ServiceBase {
           toAddress: transfer.to,
           amount: transfer.amount
         });
+        if (oThis.economyRefreshTransactions[trHash]) {
+          oThis.refreshEconomies[transfer.contractAddress] = 1;
+        }
       }
     }
 
@@ -408,14 +413,17 @@ class TokenTransferParser extends ServiceBase {
       }
 
       let createEconomyKlass = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'CreateEconomy'),
-        createEconomyObj = new createEconomyKlass({
-          contractAddress: contractAddress,
-          chainId: oThis.chainId,
-          provider: oThis.nodesHavingBlock[0],
-          ignoreErc20Validations: 1,
-          blockTimestamp: oThis.blockDetails.timestamp,
-          isUpdate: alreadyPresent ? 1 : 0
-        });
+        createEconomyObj = new createEconomyKlass(
+          {
+            contractAddress: contractAddress,
+            chainId: oThis.chainId,
+            provider: oThis.nodesHavingBlock[0],
+            ignoreErc20Validations: 1,
+            blockTimestamp: oThis.blockDetails.timestamp,
+            isUpdate: alreadyPresent ? 1 : 0
+          },
+          { conversionFactor: economiesData[contractAddress].conversionFactor }
+        );
       economyInsertPromise.push(createEconomyObj.perform());
     }
 
