@@ -413,14 +413,17 @@ class TokenTransferParser extends ServiceBase {
       }
 
       let createEconomyKlass = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'CreateEconomy'),
-        createEconomyObj = new createEconomyKlass({
-          contractAddress: contractAddress,
-          chainId: oThis.chainId,
-          provider: oThis.nodesHavingBlock[0],
-          ignoreErc20Validations: 1,
-          blockTimestamp: oThis.blockDetails.timestamp,
-          isUpdate: alreadyPresent ? 1 : 0
-        });
+        createEconomyObj = new createEconomyKlass(
+          {
+            contractAddress: contractAddress,
+            chainId: oThis.chainId,
+            provider: oThis.nodesHavingBlock[0],
+            ignoreErc20Validations: 1,
+            blockTimestamp: oThis.blockDetails.timestamp,
+            isUpdate: alreadyPresent ? 1 : 0
+          },
+          { conversionFactor: economiesData[contractAddress].conversionFactor }
+        );
       economyInsertPromise.push(createEconomyObj.perform());
     }
 
