@@ -67,6 +67,7 @@ class TokenTransferParser extends ServiceBase {
     oThis.insertionFailedTransactions = [];
     oThis.transferContractAddresses = {};
     oThis.refreshEconomies = {};
+    oThis.economyRefreshTransactions = {};
     oThis.nodesHavingBlock = nodesHavingBlock;
   }
 
@@ -175,6 +176,9 @@ class TokenTransferParser extends ServiceBase {
         oThis.tokenTransfersMap[txHash] = formattedTrxLogResp.data['tokenTransfers'];
         oThis.transactionReceiptMap[txHash]['tokenTransferIndices'] =
           formattedTrxLogResp.data['transactionTransferIndices'];
+      }
+      if (formattedTrxLogResp.isSuccess() && formattedTrxLogResp.data['knownEvents'].length > 0) {
+        oThis.economyRefreshTransactions[txHash] = 1;
       }
     }
 
@@ -320,9 +324,6 @@ class TokenTransferParser extends ServiceBase {
       for (let j = 0; j < tokenTransfers.length; j++) {
         let transfer = tokenTransfers[j];
         oThis.transferContractAddresses[transfer.contractAddress] = 1;
-        if (transfer.refreshEconomyDetails && transfer.refreshEconomyDetails === 1) {
-          oThis.refreshEconomies[transfer.contractAddress] = 1;
-        }
         insertParams[shardId].push({
           transactionHash: trHash,
           eventIndex: transfer.eventIndex,
@@ -332,6 +333,9 @@ class TokenTransferParser extends ServiceBase {
           toAddress: transfer.to,
           amount: transfer.amount
         });
+        if (oThis.economyRefreshTransactions[trHash]) {
+          oThis.refreshEconomies[transfer.contractAddress] = 1;
+        }
       }
     }
 
