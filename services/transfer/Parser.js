@@ -15,7 +15,7 @@ const rootPrefix = '../..',
   logger = require(rootPrefix + '/lib/logger/customConsoleLogger'),
   responseHelper = require(rootPrefix + '/lib/formatter/response'),
   serviceTypes = require(rootPrefix + '/lib/globalConstant/serviceTypes'),
-  formatTransactionLogs = require(rootPrefix + '/lib/transactionParser/formatTransactionLogs');
+  FormatTransactionLogs = require(rootPrefix + '/lib/transactionParser/formatTransactionLogs');
 
 // Define serviceType for getting signature.
 const serviceType = serviceTypes.TokenTransferParser;
@@ -172,13 +172,13 @@ class TokenTransferParser extends ServiceBase {
     for (let txHash in oThis.transactionReceiptMap) {
       let trxReceipt = oThis.transactionReceiptMap[txHash];
 
-      let formattedTrxLogResp = new formatTransactionLogs(trxReceipt).perform();
+      let formattedTrxLogResp = new FormatTransactionLogs(trxReceipt).perform();
       if (formattedTrxLogResp.isSuccess() && formattedTrxLogResp.data['tokenTransfers'].length > 0) {
         oThis.tokenTransfersMap[txHash] = formattedTrxLogResp.data['tokenTransfers'];
         oThis.transactionReceiptMap[txHash]['tokenTransferIndices'] =
           formattedTrxLogResp.data['transactionTransferIndices'];
       }
-      if (formattedTrxLogResp.isSuccess() && formattedTrxLogResp.data['knownEvents'].length > 0) {
+      if (formattedTrxLogResp.isSuccess() && formattedTrxLogResp.data['refreshEconomy']) {
         oThis.economyRefreshTransactions[txHash] = 1;
       }
     }

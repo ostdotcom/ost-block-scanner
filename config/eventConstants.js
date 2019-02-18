@@ -38,17 +38,6 @@ class EventConstants {
   }
 
   /**
-   * Get all known events array.
-   *
-   * @returns {Array}
-   */
-  getAllEvents() {
-    const oThis = this;
-
-    return [oThis.mintProgressedEvent, oThis.redeemProgressedEvent];
-  }
-
-  /**
    * Method signature for transfer event
    *
    * @returns {String}
@@ -78,7 +67,7 @@ class EventConstants {
    * @private
    */
   get _redeemProgressedEventSignature() {
-    return '';
+    return '0xc8a2b315f4d996ac017ddcd7121d5223ecdc6708a97a76c628b391fa0529454e';
   }
 
   /**
@@ -101,6 +90,17 @@ class EventConstants {
     const oThis = this;
 
     return [oThis._transferEventSignature, oThis._mintProgressedEventSignature, oThis._redeemProgressedEventSignature];
+  }
+
+  /**
+   * Get an array of all refresh economy signatures.
+   *
+   * @returns {Array}
+   */
+  getRefreshEconomySignatures() {
+    const oThis = this;
+
+    return [oThis._mintProgressedEventSignature, oThis._redeemProgressedEventSignature];
   }
 
   /**
