@@ -97,7 +97,7 @@ class EventConstants {
   getParsableSignatures() {
     const oThis = this;
 
-    return [oThis._transferEventSignature, oThis._ruleExecutedEventSignature];
+    return [oThis._transferEventSignature];
   }
 
   /**

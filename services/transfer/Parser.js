@@ -70,7 +70,6 @@ class TokenTransferParser extends ServiceBase {
     oThis.refreshEconomies = {};
     oThis.economyRefreshTransactions = {};
     oThis.nodesHavingBlock = nodesHavingBlock;
-    oThis.transactionInternalStatuses = {};
   }
 
   /**
@@ -179,11 +178,8 @@ class TokenTransferParser extends ServiceBase {
         oThis.transactionReceiptMap[txHash]['tokenTransferIndices'] =
           formattedTrxLogResp.data['transactionTransferIndices'];
       }
-      if (formattedTrxLogResp.isSuccess()) {
-        if (formattedTrxLogResp.data['refreshEconomy']) oThis.economyRefreshTransactions[txHash] = 1;
-
-        // Set internal status of transaction
-        oThis.transactionInternalStatuses[txHash] = formattedTrxLogResp.data['transactionInternalStatus'];
+      if (formattedTrxLogResp.isSuccess() && formattedTrxLogResp.data['refreshEconomy']) {
+        oThis.economyRefreshTransactions[txHash] = 1;
       }
     }
 
@@ -211,16 +207,14 @@ class TokenTransferParser extends ServiceBase {
       let trHash = transactionHashes[i],
         tokenTransfers = oThis.tokenTransfersMap[trHash] || [],
         trxReceipt = oThis.transactionReceiptMap[trHash],
-        shardId = oThis.transactionShardsMap[trHash],
-        transactionStatus = oThis.transactionInternalStatuses[trHash] ? 1 : 0;
+        shardId = oThis.transactionShardsMap[trHash];
 
       insertParams[shardId] = insertParams[shardId] || [];
       insertParams[shardId].push({
         chainId: oThis.chainId.toString(),
         transactionHash: trHash,
         totalTokenTransfers: trxReceipt.tokenTransferIndices.length || 0,
-        eventsParsingStatus: oThis.insertionFailedTransactions.includes(trHash) ? '-1' : '0',
-        transactionInternalStatus: transactionStatus
+        eventsParsingStatus: oThis.insertionFailedTransactions.includes(trHash) ? '-1' : '0'
       });
     }
 

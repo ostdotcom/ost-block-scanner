@@ -1,0 +1,19 @@
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "name": "_messageHash",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "name": "_status",
+        "type": "bool"
+      }
+    ],
+    "name": "RuleExecuted",
+    "type": "event"
+  }
+]

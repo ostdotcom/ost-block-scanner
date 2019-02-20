@@ -12,6 +12,7 @@ const rootPrefix = '../..',
   logger = require(rootPrefix + '/lib/logger/customConsoleLogger'),
   responseHelper = require(rootPrefix + '/lib/formatter/response'),
   fetchTransactionsReceiptsKlass = require(rootPrefix + '/services/chainInteractions/fetchTransactions'),
+  FormatTransactionLogs = require(rootPrefix + '/lib/transactionParser/formatTransactionLogs'),
   serviceTypes = require(rootPrefix + '/lib/globalConstant/serviceTypes');
 
 const InstanceComposer = OSTBase.InstanceComposer;
@@ -116,6 +117,8 @@ class TransactionParser extends ServiceBase {
       return mergedData;
     }
 
+    await oThis._decodeTransactionsInternalStatus();
+
     await oThis._addTransactionAndDetails();
 
     // If transactions entry was not created then return error
@@ -183,6 +186,31 @@ class TransactionParser extends ServiceBase {
     logger.debug('Done with Merging Pending Transaction: ', Date.now() - startTime);
 
     return responseHelper.successWithData({});
+  }
+
+  /**
+   * Decode Transaction internal status
+   *
+   * @returns {Promise<void>}
+   * @private
+   */
+  async _decodeTransactionsInternalStatus() {
+    const oThis = this,
+      startTime = Date.now();
+
+    logger.debug('Decode Transaction internal status Event: ', startTime);
+
+    for (let txHash in oThis.transactionReceiptMap) {
+      let trxReceipt = oThis.transactionReceiptMap[txHash];
+
+      let formattedTrxLogResp = new FormatTransactionLogs(trxReceipt).decodeRuleExecuteEvent();
+      if (formattedTrxLogResp.isSuccess()) {
+        // Set internal status of transaction
+        trxReceipt.internalStatus = formattedTrxLogResp.data.transactionInternalStatus;
+      }
+    }
+
+    logger.debug('Done with decoding Transaction internal status events.', Date.now() - startTime);
   }
 
   /**
