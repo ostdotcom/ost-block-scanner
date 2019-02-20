@@ -38,6 +38,15 @@ class EventConstants {
   }
 
   /**
+   * Get Rule executed event.
+   *
+   * @return {string}
+   */
+  get ruleExecutedEvent() {
+    return 'ruleExecuted';
+  }
+
+  /**
    * Method signature for transfer event
    *
    * @returns {String}
@@ -71,6 +80,16 @@ class EventConstants {
   }
 
   /**
+   * Method signature for Rule executed event
+   *
+   * @return {string}
+   * @private
+   */
+  get _ruleExecutedEventSignature() {
+    return '';
+  }
+
+  /**
    * Get an array of parsable signatures.
    *
    * @returns {Array}
@@ -78,7 +97,7 @@ class EventConstants {
   getParsableSignatures() {
     const oThis = this;
 
-    return [oThis._transferEventSignature];
+    return [oThis._transferEventSignature, oThis._ruleExecutedEventSignature];
   }
 
   /**
@@ -89,7 +108,12 @@ class EventConstants {
   getAllSignatures() {
     const oThis = this;
 
-    return [oThis._transferEventSignature, oThis._mintProgressedEventSignature, oThis._redeemProgressedEventSignature];
+    return [
+      oThis._transferEventSignature,
+      oThis._mintProgressedEventSignature,
+      oThis._redeemProgressedEventSignature,
+      oThis._ruleExecutedEventSignature
+    ];
   }
 
   /**
