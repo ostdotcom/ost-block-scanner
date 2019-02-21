@@ -86,7 +86,7 @@ class EventConstants {
    * @private
    */
   get _ruleExecutedEventSignature() {
-    return '';
+    return '0x36cd2662860eb4ad66890c2d0ac0af9dde2f8927a7190e1eaed43ce9d43682b1';
   }
 
   /**
