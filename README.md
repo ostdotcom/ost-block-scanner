@@ -1,8 +1,11 @@
 # OST Block Scanner
 
 
-![Latest version](https://img.shields.io/npm/v/@ostdotcom/ost-block-scanner.svg?maxAge=3600)
-![Downloads per month](https://img.shields.io/npm/dm/@ostdotcom/ost-block-scanner.svg?maxAge=3600)
+[![Latest version](https://img.shields.io/npm/v/@ostdotcom/ost-block-scanner.svg?maxAge=3600)][npm]
+[![Downloads per month](https://img.shields.io/npm/dm/@ostdotcom/ost-block-scanner.svg?maxAge=3600)][npm]
+
+[npm]: https://www.npmjs.com/package/@ostdotcom/ost-block-scanner
+[travis]: https://travis-ci.org/ostdotcom/ost-block-scanner
 
 OST Block Scanner parse Ethereum based chains and store data in DynamoDB. It supports multiple chains as well.
 
