@@ -1,1 +1,1 @@
-# openst-block-scanner
+# OST Block Scanner
