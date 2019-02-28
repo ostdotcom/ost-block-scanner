@@ -1,26 +1,33 @@
 {
-  "name": "@openstfoundation/openst-block-scanner",
-  "version": "0.0.1-beta.66",
-  "description": "",
-  "keywords": [],
-  "author": "OpenST Ltd.",
-  "license": "LGPL-3.0",
+  "name": "@ostdotcom/ost-block-scanner",
+  "version": "1.0.0-beta.1",
+  "description": "OST Block Scanner parse ethereum based chains and store data in DynamoDB",
+  "main": "index.js",
+  "scripts": {
+    "pre-commit": "lint-staged"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/OpenSTFoundation/openst-block-scanner.git"
+    "url": "https://github.com/ostdotcom/ost-block-scanner.git"
   },
+  "keywords": [
+    "OST",
+    "OpenST",
+    "Simple Token",
+    "Block Scanner",
+    "Ethereum",
+    "DynamoDB"
+  ],
+  "author": "OST.COM LTD",
+  "license": "LGPL-3.0",
   "bugs": {
-    "url": "https://github.com/OpenSTFoundation/openst-block-scanner/issues"
+    "url": "https://github.com/ostdotcom/ost-block-scanner/issues"
   },
-  "scripts": {
-    "make-docs": "node_modules/.bin/jsdoc -c .jsdoc.json",
-    "pre-commit": "lint-staged",
-    "test": "nyc sh tests/test.sh"
-  },
+  "homepage": "https://github.com/ostdotcom/ost-block-scanner#readme",
   "dependencies": {
-    "@openstfoundation/openst-base": "0.9.3-beta.15",
-    "@openstfoundation/openst-cache": "1.0.6-beta.13",
-    "@openstfoundation/openst-storage": "1.0.2-beta.29",
+    "@ostdotcom/base": "1.0.0-beta.1",
+    "@ostdotcom/cache": "1.0.6-beta.14",
+    "@ostdotcom/storage": "1.0.3-beta.1",
     "abi-decoder": "1.0.9",
     "bignumber.js": "4.1.0",
     "chai": "4.2.0",
@@ -31,9 +38,7 @@
     "uuid": "3.1.0"
   },
   "devDependencies": {
-    "jsdoc": "3.5.5",
     "lint-staged": "8.0.3",
-    "nyc": "13.1.0",
     "pre-commit": "1.2.2",
     "prettier": "1.14.3"
   },

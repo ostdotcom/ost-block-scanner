@@ -19,7 +19,7 @@
 const rootPrefix = '..',
   program = require('commander'),
   basicHelper = require(rootPrefix + '/helpers/basic'),
-  OSTBase = require('@openstfoundation/openst-base'),
+  OSTBase = require('@ostdotcom/base'),
   coreConstants = require(rootPrefix + '/config/coreConstants'),
   logger = require(rootPrefix + '/lib/logger/customConsoleLogger'),
   responseHelper = require(rootPrefix + '/lib/formatter/response'),

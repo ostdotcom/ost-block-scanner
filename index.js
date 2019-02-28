@@ -1,12 +1,12 @@
 'use strict';
 /**
- * Index File for openst-block-scanner
+ * Index File for ost-block-scanner
  *
  * @module index
  */
 const rootPrefix = '.',
   version = require(rootPrefix + '/package.json').version,
-  OSTBase = require('@openstfoundation/openst-base'),
+  OSTBase = require('@ostdotcom/base'),
   coreConstants = require(rootPrefix + '/config/coreConstants');
 
 const InstanceComposer = OSTBase.InstanceComposer;
@@ -76,9 +76,9 @@ require(rootPrefix + '/services/economy/Create');
 require(rootPrefix + '/services/economy/Aggregator');
 require(rootPrefix + '/services/economy/GetTokenHolders');
 
-class OpenSTBlockScanner {
+class OSTBlockScanner {
   /**
-   * Constructor for openst-block-scanner
+   * Constructor for ost-block-scanner
    *
    * @param {Object} configStrategy
    * @constructor
@@ -204,4 +204,4 @@ class OpenSTBlockScanner {
   }
 }
 
-module.exports = OpenSTBlockScanner;
+module.exports = OSTBlockScanner;

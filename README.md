@@ -1,92 +1,80 @@
-# OpenST Block Scanner
-Parse any ethereum based blockchain and populate data in DynamoDB. Multiple chains are supported to be parsed and 
-processed data can be queried.
+# OST Block Scanner
 
 
-## Different shard types
-Parsed data is stored in multiple DynamoDB tables. Some data/entities are stored in shared tables and some data is 
-stored in shared tables. 
+[![Latest version](https://img.shields.io/npm/v/@ostdotcom/ost-block-scanner.svg?maxAge=3600)][npm]
+[![Downloads per month](https://img.shields.io/npm/dm/@ostdotcom/ost-block-scanner.svg?maxAge=3600)][npm]
 
- *  Shared tables:
-    * Chain table.
-    * Shard table.
-    * Economy table.
-    * ShardByBlock table.
-    * ShardByEconomy table.
-    * ShardByEconomyAddress table.
-    * ShardByTransaction table.
+OST Block Scanner parse Ethereum based chains and store data in DynamoDB. It supports multiple chains as well.
+
+
+# Install
+
+```bash
+  npm install @ostdotcom/ost-block-scanner --save
+```
+
+# Setup
+
+#### 1. Install Prerequisites 
+- [nodejs](https://nodejs.org/) >= 8.0.0
+- [Geth](https://github.com/ethereum/go-ethereum/) >=1.8.17
+- [Memcached](https://memcached.org/)
+- AWS DynamoDB Service OR [DynamoDBLocal.jar](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.DownloadingAndRunning.html)
+- [DB Browser for SQLite](https://sqlitebrowser.org/) optionally to browse DynamoDB
     
- * Sharded tables:
-    * Block table (sharded by block).
-    * Economy Address Balance table (sharded by economy). 
-    * Economy Address Transaction table (sharded by economy address). 
-    * Economy Address Transfer table (sharded by economy address). 
-    * Token Transfer table (sharded by transaction). 
-    * Transaction table (sharded by transaction). 
-        
-## Setup openst-block-scanner
+#### 2. Run DynamoDBLocal.jar, if you are not using AWS DynamoDB Service
 
-* You will need following for development environment setup.
-    - [nodejs](https://nodejs.org/) >= 8.0.0
-    - [Geth](https://github.com/ethereum/go-ethereum/) >=1.8.17
-    - [Memcached](https://memcached.org/)
-    - [DB Browser for SQLite](https://sqlitebrowser.org/)
+```bash
+  # NOTE: Make sure to change DYNAMODB_PATH
+  export DYNAMODB_PATH=~/dynamodb_local_latest
+  java -Djava.library.path=$DYNAMODB_PATH/DynamoDBLocal_lib/ -jar $DYNAMODB_PATH/DynamoDBLocal.jar -sharedDb -dbPath $DYNAMODB_PATH/
+```
 
-* Run following command to start Dynamo DB.
-  ```bash
-  > java -Djava.library.path=~/dynamodb_local_latest/DynamoDBLocal_lib/ -jar ~/dynamodb_local_latest/DynamoDBLocal.jar -sharedDb -dbPath ~/dynamodb_local_latest/
-  ```
+#### 3. Create OST Block Scanner config file 
+Refer ./node_modules/@ostdotcom/ost-block-scanner/config.json.example to create a new configuration file. 
+Also set CONFIG_STRATEGY_PATH environment variable
 
-* Create all the shared tables by running the following script: 
-    ```bash
-    export CONFIG_STRATEGY_PATH=$(pwd)/tests/data/config.json
-    node tools/initialSetup.js --configFile $CONFIG_STRATEGY_PATH
-    ```
-* Run the addChain service and pass all the necessary parameters:
-    ```bash
-    export CONFIG_STRATEGY_PATH=$(pwd)/tests/data/config.json
-    node tools/addChain.js --chainId 1000 --networkId 1 --blockShardCount 2 --economyShardCount 2 --economyAddressShardCount 2 --transactionShardCount 2 --configFile $CONFIG_STRATEGY_PATH
-    ```
-    * Mandatory parameters: chainId, networkId, configFile
-    * Optional parameters (defaults to 1): blockShardCount, economyShardCount, economyAddressShardCount, transactionShardCount
-    
-## Running individual services.
+#### 4. Create Global DynamoDB tables: 
 
-* Add shards for a new chain:
-    ```bash
-    export CONFIG_STRATEGY_PATH=$(pwd)/config.json
-    node tools/addChain.js --chainId 1000 --networkId 1 --blockShardCount 1 --economyShardCount 1 --economyAddressShardCount 1 --transactionShardCount 1 --configFile $CONFIG_STRATEGY_PATH
-    ```
-* Add block(sharded) shards for existing chain:
-    ```bash
-    export CONFIG_STRATEGY_PATH=$(pwd)/config.json
-    node tools/createShards/byBlock.js --chainId 1000 --shardCount 1 --configFile $CONFIG_STRATEGY_PATH
-    ```
-* Add chainId shard for existing chain:
-    ```bash
-    export CONFIG_STRATEGY_PATH=$(pwd)/config.json
-    node tools/createShards/byChainId.js --chainId 1000 --configFile $CONFIG_STRATEGY_PATH
-    ```
-* Add economy(sharded) shards for existing chain:
-    ```bash
-    export CONFIG_STRATEGY_PATH=$(pwd)/config.json
-    node tools/createShards/byEconomy.js --chainId 1000 --shardCount 1 --configFile $CONFIG_STRATEGY_PATH
-    ```
-* Add economy address(sharded) shards for existing chain:
-    ```bash
-    export CONFIG_STRATEGY_PATH=$(pwd)/config.json
-    node tools/createShards/byEconomyAddress.js --chainId 1000 --shardCount 1 --configFile $CONFIG_STRATEGY_PATH
-    ```
-* Add transactions(sharded) shards for existing chain:
-    ```bash
-    export CONFIG_STRATEGY_PATH=$(pwd)/config.json
-    node tools/createShards/byTransaction.js --chainId 1000 --shardCount 1 --configFile $CONFIG_STRATEGY_PATH
-    ```
+```bash
+  node ./node_modules/@ostdotcom/ost-block-scanner/tools/initialSetup.js --configFile $CONFIG_STRATEGY_PATH
+```
+
+#### 5. Add a new Chain and create chain specific shared DynamoDB tables:
+  * Mandatory parameters: chainId, networkId, configFile
+  * Optional parameters (defaults to 1): blockShardCount, economyShardCount, economyAddressShardCount, transactionShardCount
   
-## Block Scanner Executable
-* Running Block Scanner.
+```bash
+  # NOTE:
+  # Make sure chain configuration is already present in config file, before starting this step. 
+  # Optional parameters are used to create entity specific sharded tables. 
+  # By default only one shard is created for each entity. 
+  node ./node_modules/@ostdotcom/ost-block-scanner/tools/addChain.js --configFile $CONFIG_STRATEGY_PATH --chainId 2000 --networkId 1 --blockShardCount 2 --economyShardCount 2 --economyAddressShardCount 2 --transactionShardCount 2
+```
 
-    ```bash
-    export CONFIG_STRATEGY_PATH=$(pwd)/config.json
-    node executables/blockScanner.js --chainId 1000 --configFile $CONFIG_STRATEGY_PATH --startBlockNumber 0 --endBlockNumber 100
-    ```
+#### How to add additional shards to existing chains?
+
+* Additional block specific data shards:
+
+```bash
+  node ./node_modules/@ostdotcom/ost-block-scanner/tools/createShards/byBlock.js --configFile $CONFIG_STRATEGY_PATH --chainId 2000 --shardNumber 1
+```
+
+* Additional economy user(s) specific data shards:
+
+```bash
+  node ./node_modules/@ostdotcom/ost-block-scanner/tools/createShards/byEconomyAddress.js --configFile $CONFIG_STRATEGY_PATH --chainId 2000 --shardNumber 1
+```
+
+* Additional transaction specific data shards:
+
+```bash
+  node ./node_modules/@ostdotcom/ost-block-scanner/tools/createShards/byTransaction.js --configFile $CONFIG_STRATEGY_PATH --chainId 2000 --shardNumber 1
+```
+    
+# Start Block Scanner
+  * Mandatory parameters: chainId, configFile
+  * Optional parameters: startBlockNumber, endBlockNumber
+```bash
+  node ./node_modules/@ostdotcom/ost-block-scanner/executables/blockScanner.js --configFile $CONFIG_STRATEGY_PATH --chainId 2000 --startBlockNumber 0 --endBlockNumber 100
+```
