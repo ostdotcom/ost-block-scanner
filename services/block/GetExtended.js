@@ -7,7 +7,7 @@
 const rootPrefix = '../..',
   ServicesBase = require(rootPrefix + '/services/Base'),
   coreConstants = require(rootPrefix + '/config/coreConstants'),
-  OSTBase = require('@openstfoundation/openst-base'),
+  OSTBase = require('@ostdotcom/base'),
   responseHelper = require(rootPrefix + '/lib/formatter/response'),
   logger = require(rootPrefix + '/lib/logger/customConsoleLogger'),
   serviceTypes = require(rootPrefix + '/lib/globalConstant/serviceTypes');

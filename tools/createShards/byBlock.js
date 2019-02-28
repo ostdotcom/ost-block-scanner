@@ -6,7 +6,7 @@
  */
 const rootPrefix = '../..',
   program = require('commander'),
-  OSTBase = require('@openstfoundation/openst-base'),
+  OSTBase = require('@ostdotcom/base'),
   coreConstants = require(rootPrefix + '/config/coreConstants'),
   logger = require(rootPrefix + '/lib/logger/customConsoleLogger');
 
@@ -17,7 +17,7 @@ require(rootPrefix + '/lib/cacheManagement/shared/AvailableShards');
 
 program
   .option('--chainId <chainId>', 'Chain id')
-  .option('--shardCount <shardCount>', 'Number of block shards to be created')
+  .option('--shardNumber <shardNumber>', 'Number of block shards to be created')
   .option('--configFile <configFile>', 'Block scanner config strategy absolute file path')
   .parse(process.argv);
 
@@ -25,7 +25,7 @@ program.on('--help', () => {
   logger.log('');
   logger.log('  Example:');
   logger.log('');
-  logger.log("    node tools/createShards/byBlock.js --chainId 189 --shardCount 1 --configFile './config.json'");
+  logger.log("    node tools/createShards/byBlock.js --chainId 189 --shardNumber 1 --configFile './config.json'");
   logger.log('');
   logger.log('');
 });
@@ -36,7 +36,7 @@ class CreateShardByBlock {
    *
    * @param {Object} params
    * @param {String} params.chainId
-   * @param {String} params.shardCount
+   * @param {String} params.shardNumber
    * @param {String} params.configFile
    * @constructor
    */
@@ -44,8 +44,10 @@ class CreateShardByBlock {
     const oThis = this;
 
     oThis.chainId = params.chainId;
-    oThis.shardCount = params.shardCount;
+    oThis.shardNumber = params.shardNumber;
     oThis.config = require(params.configFile);
+
+    oThis.ic = new InstanceComposer(oThis.config);
   }
 
   /**
@@ -69,15 +71,11 @@ class CreateShardByBlock {
    */
   async asyncPerform() {
     const oThis = this,
-      instanceComposer = new InstanceComposer(oThis.config),
-      CreateShardByBlock = instanceComposer.getShadowedClassFor(coreConstants.icNameSpace, 'ShardByBlockService');
+      CreateShardByBlock = oThis.ic.getShadowedClassFor(coreConstants.icNameSpace, 'ShardByBlockService');
 
-    //TODO - @shlok - instead of shardCount, use array of shardNumbers
-    for (let index = 0; index < oThis.shardCount; index++) {
-      let createShardByBlock = new CreateShardByBlock({ chainId: oThis.chainId, shardNumber: index + 1 });
+    let createShardByBlock = new CreateShardByBlock(oThis.chainId, oThis.shardNumber);
 
-      await createShardByBlock.perform();
-    }
+    await createShardByBlock.perform();
 
     // Clear cache.
     await oThis._clearCache();
@@ -92,7 +90,7 @@ class CreateShardByBlock {
    */
   async _clearCache() {
     const oThis = this,
-      AvailableShardsCache = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'AvailableShardsCache'),
+      AvailableShardsCache = oThis.ic.getShadowedClassFor(coreConstants.icNameSpace, 'AvailableShardsCache'),
       availableShardsCacheObj = new AvailableShardsCache({});
 
     await availableShardsCacheObj.clear();
@@ -104,7 +102,7 @@ class CreateShardByBlock {
  * This method performs certain validations on the input params.
  */
 const validateAndSanitize = function() {
-  if (!program.chainId || !program.shardCount || !program.configFile) {
+  if (!program.chainId || !program.shardNumber || !program.configFile) {
     program.help();
     process.exit(1);
   }

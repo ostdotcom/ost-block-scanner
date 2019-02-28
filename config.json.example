@@ -1,5 +1,5 @@
 {
-  "ddbTablePrefix": "de_ma_",
+  "ddbTablePrefix": "de_m_a_",
   "cache": {
     "engine": "memcached",
     "servers": [

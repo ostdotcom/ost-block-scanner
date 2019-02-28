@@ -5,9 +5,6 @@
 /.idea
 /.idea/*
 
-/tests/data/geth
-/.nyc_output/*
-
 package-lock.json
 /config.json
 

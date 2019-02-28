@@ -31,7 +31,6 @@ class CoreConstants {
     return process.env.OST_DEBUG_ENABLED;
   }
 
-
   /**
    * Error config
    *
@@ -50,9 +49,8 @@ class CoreConstants {
    * @return {String}
    */
   get icNameSpace() {
-    return 'openst-block-scanner';
+    return 'ost-block-scanner';
   }
-
 }
 
 module.exports = new CoreConstants();
