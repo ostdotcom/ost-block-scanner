@@ -225,15 +225,15 @@ const paramErrorConfig = {
     code: 'invalid',
     message: 'Invalid address'
   },
-  missingSimpleStakeAddress: {
-    parameter: 'simpleStakeAddress',
+  missingGatewayContractAddress: {
+    parameter: 'gatewayContractAddress',
     code: 'missing',
-    message: 'Missing simpleStake address'
+    message: 'Missing gatewayContract address'
   },
-  invalidSimpleStakeAddress: {
-    parameter: 'simpleStakeAddress',
+  invalidGatewayContractAddress: {
+    parameter: 'gatewayContractAddress',
     code: 'invalid',
-    message: 'Invalid simpleStake address'
+    message: 'Invalid gatewayContract address'
   },
   missingDecimals: {
     parameter: 'decimals',

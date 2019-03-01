@@ -32,7 +32,7 @@ class CreateEconomyService extends ServicesBase {
    * @param {Number} chainId
    * @param {Number} decimals
    * @param {String} contractAddress
-   * @param {String} simpleStakeAddress
+   * @param {String} gatewayContractAddress
    * @param {String} provider
    * @param {Number} blockTimestamp
    * @param {String} displayName
@@ -45,7 +45,7 @@ class CreateEconomyService extends ServicesBase {
     chainId,
     decimals,
     contractAddress,
-    simpleStakeAddress,
+    gatewayContractAddress,
     provider,
     blockTimestamp,
     displayName,
@@ -57,7 +57,7 @@ class CreateEconomyService extends ServicesBase {
       chainId: chainId,
       decimals: decimals,
       contractAddress: contractAddress,
-      simpleStakeAddress: simpleStakeAddress,
+      gatewayContractAddress: gatewayContractAddress,
       provider: provider,
       blockTimestamp: blockTimestamp,
       displayName: displayName,
@@ -73,7 +73,7 @@ class CreateEconomyService extends ServicesBase {
     oThis.decimals = decimals;
     oThis.contractAddress = contractAddress;
     oThis.provider = provider;
-    oThis.simpleStakeAddress = simpleStakeAddress;
+    oThis.gatewayContractAddress = gatewayContractAddress;
     oThis.blockTimestamp = blockTimestamp;
     oThis.displayName = displayName;
     oThis.conversionFactor = conversionFactor;
@@ -117,7 +117,7 @@ class CreateEconomyService extends ServicesBase {
         displayName: oThis.displayName,
         conversionFactor: oThis.conversionFactor,
         symbol: oThis.symbol,
-        simpleStakeAddress: oThis.simpleStakeAddress,
+        gatewayContractAddress: oThis.gatewayContractAddress,
         originContractAddress: oThis.originContractAddress
       },
       createEconomyObj = new createEconomyKlass(mandatoryParams, optionalParams);
