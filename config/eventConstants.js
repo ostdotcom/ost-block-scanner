@@ -43,7 +43,7 @@ class EventConstants {
    * @return {string}
    */
   get ruleExecutedEvent() {
-    return 'ruleExecuted';
+    return 'ruleexecuted';
   }
 
   /**
