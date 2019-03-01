@@ -391,7 +391,7 @@ const signature = {
         validatorMethod: 'validateEthAddress'
       },
       {
-        parameter: 'simpleStakeAddress',
+        parameter: 'gatewayContractAddress',
         validatorMethod: 'validateEthAddress'
       },
       {
