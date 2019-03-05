@@ -534,7 +534,6 @@ class TokenTransferParser extends ServiceBase {
 
     let AddressBalanceCacheClass = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'AddressBalanceCache');
     for(let contractAddress in balanceCacheClearMap){
-      console.log();
       new AddressBalanceCacheClass({
         chainId: oThis.chainId,
         economyContractAddress: contractAddress,
