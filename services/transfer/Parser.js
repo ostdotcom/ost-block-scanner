@@ -29,6 +29,7 @@ require(rootPrefix + '/lib/models/sharded/byTransaction/TokenTransfer');
 require(rootPrefix + '/lib/economyAddresses/WriteEconomyAddressTransfers');
 require(rootPrefix + '/lib/cacheMultiManagement/chainSpecific/TokenTransfer');
 require(rootPrefix + '/lib/cacheMultiManagement/shared/shardIdentifier/ByTransaction');
+require(rootPrefix + '/lib/cacheMultiManagement/chainSpecific/AddressBalance');
 
 /**
  * Class for token transfer parser
@@ -511,11 +512,16 @@ class TokenTransferParser extends ServiceBase {
   _clearTransfersCache(transferRows) {
     const oThis = this;
 
-    let eventIndexMap = {};
+    let eventIndexMap = {},
+      balanceCacheClearMap = {};
     for (let index in transferRows) {
       let te = transferRows[index];
       eventIndexMap[te.transactionHash] = eventIndexMap[te.transactionHash] || [];
       eventIndexMap[te.transactionHash].push(te.eventIndex);
+
+      balanceCacheClearMap[te.contractAddress] = balanceCacheClearMap[te.contractAddress] || [];
+      balanceCacheClearMap[te.contractAddress].push(te.fromAddress);
+      balanceCacheClearMap[te.contractAddress].push(te.toAddress);
     }
 
     let cacheKlass = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'TokenTransferCache'),
@@ -525,6 +531,16 @@ class TokenTransferParser extends ServiceBase {
       });
 
     cacheObj.clear();
+
+    let AddressBalanceCacheClass = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'AddressBalanceCache');
+    for(let contractAddress in balanceCacheClearMap){
+      new AddressBalanceCacheClass({
+        chainId: oThis.chainId,
+        economyContractAddress: contractAddress,
+        addresses: balanceCacheClearMap[contractAddress]
+      }).clear()
+    }
+
   }
 }
 
