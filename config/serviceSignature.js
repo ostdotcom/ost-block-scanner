@@ -187,8 +187,8 @@ const signature = {
         validatorMethod: 'validateInteger'
       },
       {
-        parameter: 'transactionHash',
-        validatorMethod: 'validateTransactionHash'
+        parameter: 'transactionHashes',
+        validatorMethod: 'validateTransactionHashArray'
       }
     ],
     optional: [
