@@ -21,7 +21,7 @@ require(rootPrefix + '/lib/cacheMultiManagement/shared/shardIdentifier/ByTransac
 
 // Define serviceType for getting signature.
 const serviceType = serviceTypes.AllTransferDetails;
-const ddbQueryBatchSize = 1;
+const ddbQueryBatchSize = 30;
 
 /**
  * Class for getting all token transfer details service
@@ -46,6 +46,7 @@ class GetAllTransferDetail extends ServicesBase {
     const oThis = this;
 
     oThis.chainId = chainId.toString();
+    oThis.transactionHashes = transactionHashes;
     oThis.shardTransactionsMap = {};
     oThis.transactionTransferDetails = {};
   }
@@ -62,7 +63,7 @@ class GetAllTransferDetail extends ServicesBase {
 
     await oThis._fetchTokenTransfers();
 
-    return Promise.resolve(oThis.transactionTransferDetails);
+    return responseHelper.successWithData(oThis.transactionTransferDetails);
   }
 
   /**
@@ -96,7 +97,10 @@ class GetAllTransferDetail extends ServicesBase {
                 isError = resp.isFailure() || !resp.data;
                 for (let txHash in resp.data) {
                   let shard = resp.data[txHash]['shardIdentifier'];
-
+                  if (!shard) {
+                    isError = true;
+                    onResolve();
+                  }
                   oThis.shardTransactionsMap[shard] = oThis.shardTransactionsMap[shard] || [];
                   oThis.shardTransactionsMap[shard].push(txHash);
                 }
@@ -117,9 +121,10 @@ class GetAllTransferDetail extends ServicesBase {
 
     if (isError) {
       return Promise.reject(
-        responseHelper.error({
+        responseHelper.paramValidationError({
           internal_error_identifier: 's_trf_ga_1',
           api_error_identifier: 'something_went_wrong',
+          params_error_identifiers: 'invalidTransactionHashes',
           debug_options: {}
         })
       );
@@ -182,7 +187,7 @@ class GetAllTransferDetail extends ServicesBase {
               .then(function(resp) {
                 if (!isError) {
                   isError = resp.isFailure() || !resp.data;
-                  oThis.transactionTransferDetails[txHash] = resp.data;
+                  oThis.transactionTransferDetails[txHash] = resp.data[txHash].transfers;
                 }
                 onResolve();
               })
