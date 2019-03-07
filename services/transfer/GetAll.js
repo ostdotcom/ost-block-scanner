@@ -1,8 +1,8 @@
 'use strict';
 /**
- * This service will give all the token transfer details of the transaction hash passed.
+ * This service fetches token transfers details of given transaction hashes.
  *
- * @module services/transfer/Get
+ * @module services/transfer/GetAll
  */
 const rootPrefix = '../..',
   ServicesBase = require(rootPrefix + '/services/Base'),
@@ -21,6 +21,7 @@ require(rootPrefix + '/lib/cacheMultiManagement/shared/shardIdentifier/ByTransac
 
 // Define serviceType for getting signature.
 const serviceType = serviceTypes.AllTransferDetails;
+const ddbQueryBatchSize = 30;
 
 /**
  * Class for getting all token transfer details service
@@ -34,31 +35,20 @@ class GetAllTransferDetail extends ServicesBase {
    * @augments ServicesBase
    *
    * @param {Number} chainId
-   * @param {String} transactionHash
-   * @param {Object} options
-   * @param {Object} options.nextPagePayload
-   * @param {Object} options.nextPagePayload.LastEvaluatedKey
-   * @param {Object} options.transactionHashToShardIdentifierMap
-   * @param {Number} options.consistentRead
-   * @param {Number} options.pageSize
+   * @param {Array} transactionHashes
    *
    * @constructor
    */
-  constructor(chainId, transactionHash, options) {
-    const params = { chainId: chainId, transactionHash: transactionHash, options: options };
+  constructor(chainId, transactionHashes) {
+    const params = { chainId: chainId, transactionHashes: transactionHashes };
     super(params, serviceType);
 
     const oThis = this;
 
     oThis.chainId = chainId.toString();
-    oThis.transactionHash = transactionHash;
-
-    if (options) {
-      if (options.transactionHashToShardIdentifierMap)
-        oThis.transactionHashToShardIdentifierMap = options.transactionHashToShardIdentifierMap;
-      if (options.pageSize) oThis.pageSize = options.pageSize || paginationLimits.AllTransferDetails;
-      if (options.nextPagePayload) oThis.LastEvaluatedKey = options.nextPagePayload.LastEvaluatedKey;
-    }
+    oThis.transactionHashes = transactionHashes;
+    oThis.shardTransactionsMap = {};
+    oThis.transactionTransferDetails = {};
   }
 
   /**
@@ -69,90 +59,161 @@ class GetAllTransferDetail extends ServicesBase {
   async asyncPerform() {
     const oThis = this;
 
-    let transactionDetails;
+    await oThis._fetchTransactionShards();
 
-    if (oThis.transactionHashToShardIdentifierMap) {
-      oThis.shardIdentifier = oThis.transactionHashToShardIdentifierMap[oThis.transactionHash];
-    }
+    await oThis._fetchTokenTransfers();
 
-    if (!oThis.LastEvaluatedKey) {
-      // First Page
-      transactionDetails = await oThis._fetchTransfersFromCache();
-    } else {
-      // Other Pages
-      transactionDetails = await oThis._fetchTransfersFromDb();
-    }
-
-    return Promise.resolve(transactionDetails);
+    return responseHelper.successWithData(oThis.transactionTransferDetails);
   }
 
   /**
-   * This method fetches the token transfer details for the given transaction hash.
+   * Fetch shards of transactions
    *
-   * @returns {Promise<>}
+   * @returns {Promise<Void>}
+   * @private
    */
-  async _fetchTransfersFromCache() {
-    const oThis = this,
-      paramsForTransactionTokenTransferCache = {
-        chainId: oThis.chainId,
-        transactionHash: oThis.transactionHash,
-        shardIdentifier: oThis.shardIdentifier,
-        pageSize: oThis.pageSize
-      },
-      TransactionTokenTransferCache = oThis
-        .ic()
-        .getShadowedClassFor(coreConstants.icNameSpace, 'TransactionTokenTransfer'),
-      transactionTokenTransferCacheObj = new TransactionTokenTransferCache(paramsForTransactionTokenTransferCache),
-      txHashDetails = await transactionTokenTransferCacheObj.fetch();
+  async _fetchTransactionShards() {
+    const oThis = this;
 
-    if (txHashDetails.isFailure()) {
-      logger.error('Error in fetching data from Transaction Token Transfer cache');
+    let index = 0,
+      promises = [],
+      isError = false,
+      ShardIdentifierByTransactionCache = oThis
+        .ic()
+        .getShadowedClassFor(coreConstants.icNameSpace, 'ShardIdentifierByTransactionCache');
+    while (index < oThis.transactionHashes.length) {
+      let txHashes = oThis.transactionHashes.slice(index, index + ddbQueryBatchSize);
+
+      promises.push(
+        new Promise(function(onResolve, onReject) {
+          new ShardIdentifierByTransactionCache({
+            chainId: oThis.chainId,
+            transactionHashes: txHashes,
+            consistentRead: oThis.consistentRead
+          })
+            .fetch()
+            .then(function(resp) {
+              if (!isError) {
+                isError = resp.isFailure() || !resp.data;
+                for (let txHash in resp.data) {
+                  let shard = resp.data[txHash]['shardIdentifier'];
+                  if (!shard) {
+                    isError = true;
+                    onResolve();
+                  }
+                  oThis.shardTransactionsMap[shard] = oThis.shardTransactionsMap[shard] || [];
+                  oThis.shardTransactionsMap[shard].push(txHash);
+                }
+              }
+              onResolve();
+            })
+            .catch(function(error) {
+              isError = true;
+              onResolve();
+            });
+        })
+      );
+
+      index = index + ddbQueryBatchSize;
+    }
+
+    await Promise.all(promises);
+
+    if (isError) {
       return Promise.reject(
-        responseHelper.error({
+        responseHelper.paramValidationError({
           internal_error_identifier: 's_trf_ga_1',
           api_error_identifier: 'something_went_wrong',
+          params_error_identifiers: 'invalidTransactionHashes',
           debug_options: {}
         })
       );
     }
-    return Promise.resolve(txHashDetails);
   }
 
   /**
-   * This method fetches the token transfer details for the given transaction hash from the DB.
+   * Fetch Token transfers
    *
-   * @returns {Promise<*>}
+   * @returns {Promise<void>}
    * @private
    */
-  async _fetchTransfersFromDb() {
-    const oThis = this,
-      TokenTransferModelClass = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'TokenTransferModel');
+  async _fetchTokenTransfers() {
+    const oThis = this;
 
-    // If shardIdentifier is unavailable.
-    if (!oThis.shardIdentifier) {
-      let ShardIdentifierByTransactionCache = oThis
-          .ic()
-          .getShadowedClassFor(coreConstants.icNameSpace, 'ShardIdentifierByTransactionCache'),
-        getShardRsp = await new ShardIdentifierByTransactionCache({
-          chainId: oThis.chainId,
-          transactionHashes: [oThis.transactionHash],
-          consistentRead: oThis.consistentRead
-        }).fetch();
-
-      if (getShardRsp.isFailure()) {
-        return Promise.reject(getShardRsp);
-      }
-
-      oThis.shardIdentifier = getShardRsp.data[oThis.transactionHash]['shardIdentifier'];
+    // Putting parallel queries on different sharded transfer tables
+    let promises = [];
+    for (let shardId in oThis.shardTransactionsMap) {
+      promises.push(oThis._fetchTransfersFromShard(shardId));
     }
 
-    let response = await new TokenTransferModelClass({
-      chainId: oThis.chainId,
-      shardIdentifier: oThis.shardIdentifier,
-      pageSize: oThis.pageSize
-    }).getAllTransfers(oThis.transactionHash, oThis.LastEvaluatedKey);
+    await Promise.all(promises);
+  }
 
-    return Promise.resolve(response);
+  /**
+   * Fetch transfers from given shard
+   *
+   * @param shardIdentifier
+   * @returns {Promise<Void>}
+   * @private
+   */
+  async _fetchTransfersFromShard(shardIdentifier) {
+    const oThis = this,
+      TransactionTokenTransferCache = oThis
+        .ic()
+        .getShadowedClassFor(coreConstants.icNameSpace, 'TransactionTokenTransfer');
+
+    let i = 0;
+    while (i < oThis.shardTransactionsMap[shardIdentifier].length) {
+      // Doing batching here as we don't want to fire many parallel queries on dynamo
+
+      let batchedTxHashes = oThis.shardTransactionsMap[shardIdentifier].slice(i, i + ddbQueryBatchSize),
+        promises = [],
+        isError = false;
+
+      // Firing parallel queries on dynamo sharded transfer table.
+      for (let index in batchedTxHashes) {
+        let txHash = batchedTxHashes[index];
+
+        let paramsForTransactionTokenTransferCache = {
+          chainId: oThis.chainId,
+          transactionHash: txHash,
+          shardIdentifier: shardIdentifier
+        };
+
+        promises.push(
+          new Promise(function(onResolve, onReject) {
+            new TransactionTokenTransferCache(paramsForTransactionTokenTransferCache)
+              .fetch()
+              .then(function(resp) {
+                if (!isError) {
+                  isError = resp.isFailure() || !resp.data;
+                  oThis.transactionTransferDetails[txHash] = resp.data[txHash].transfers;
+                }
+                onResolve();
+              })
+              .catch(function(error) {
+                isError = true;
+                onResolve();
+              });
+          })
+        );
+      }
+
+      await Promise.all(promises);
+
+      if (isError) {
+        logger.error('Error in fetching data from Transaction Token Transfer cache');
+        return Promise.reject(
+          responseHelper.error({
+            internal_error_identifier: 's_trf_ga_2',
+            api_error_identifier: 'something_went_wrong',
+            debug_options: {}
+          })
+        );
+      }
+
+      i = i + ddbQueryBatchSize;
+    }
   }
 }
 
