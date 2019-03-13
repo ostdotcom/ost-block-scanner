@@ -10,15 +10,15 @@
 OST Block Scanner parses Ethereum-based chains and stores data in DynamoDB. It supports multiple chains, as well.
 
 
-# Install
+## Install
 
 ```bash
   npm install @ostdotcom/ost-block-scanner --save
 ```
 
-# Setup
+## Setup
 
-#### 1. Install Prerequisites 
+### 1. Install Prerequisites 
 - [nodejs](https://nodejs.org/) >= 8.0.0
 - [Geth](https://github.com/ethereum/go-ethereum/) >=1.8.17
 - [Memcached](https://memcached.org/)
@@ -26,7 +26,7 @@ OST Block Scanner parses Ethereum-based chains and stores data in DynamoDB. It s
 - [Java](https://www.java.com/) >= 6.0, if using DynamoDBLocal.jar
 - [DB Browser for SQLite](https://sqlitebrowser.org/) optionally to browse DynamoDB
     
-#### 2. Run DynamoDBLocal.jar, if you are not using AWS DynamoDB Service
+### 2. Run DynamoDBLocal.jar, if you are not using AWS DynamoDB Service
 
 ```bash
   # NOTE: Make sure to change DYNAMODB_PATH
@@ -34,12 +34,12 @@ OST Block Scanner parses Ethereum-based chains and stores data in DynamoDB. It s
   java -Djava.library.path=$DYNAMODB_PATH/DynamoDBLocal_lib/ -jar $DYNAMODB_PATH/DynamoDBLocal.jar -sharedDb -dbPath $DYNAMODB_PATH/
 ```
 
-#### 3. Create OST Block Scanner config file
+### 3. Create OST Block Scanner config file
 Refer to [config.json.example](config.json.example) to create a new configuration file.
 
 Set `CONFIG_STRATEGY_PATH` environment variable to the path of the configuration file just created.
 
-#### 4. Create Global DynamoDB tables: 
+### 4. Create Global DynamoDB tables: 
 
 ```bash
   node ./node_modules/@ostdotcom/ost-block-scanner/tools/initialSetup.js --configFile $CONFIG_STRATEGY_PATH
@@ -61,7 +61,7 @@ Set `CONFIG_STRATEGY_PATH` environment variable to the path of the configuration
   node ./node_modules/@ostdotcom/ost-block-scanner/tools/addChain.js --configFile $CONFIG_STRATEGY_PATH --chainId 2000 --networkId 1 --blockShardCount 2 --economyShardCount 2 --economyAddressShardCount 2 --transactionShardCount 2
 ```
 
-#### 6. Add additional shards to existing chains (optional)
+### 6. Add additional shards to existing chains (optional)
 
 * Additional block specific data shards:
 
@@ -81,9 +81,15 @@ Set `CONFIG_STRATEGY_PATH` environment variable to the path of the configuration
   node ./node_modules/@ostdotcom/ost-block-scanner/tools/createShards/byTransaction.js --configFile $CONFIG_STRATEGY_PATH --chainId 2000 --shardNumber 1
 ```
     
+<<<<<<< HEAD
 # Start Block Scanner
   * Mandatory parameters: `chainId`, `configFile`
   * Optional parameters: `startBlockNumber`, `endBlockNumber`
+=======
+## Start Block Scanner
+  * Mandatory parameters: chainId, configFile
+  * Optional parameters: startBlockNumber, endBlockNumber
+>>>>>>> 08bd867... Readme: update headings for accessibility
 ```bash
   node ./node_modules/@ostdotcom/ost-block-scanner/executables/blockScanner.js --configFile $CONFIG_STRATEGY_PATH --chainId 2000 --startBlockNumber 0 --endBlockNumber 100
 ```
