@@ -107,8 +107,12 @@ class GetTokenHolders extends ServicesBase {
       queryParams['ExclusiveStartKey'] = oThis.LastEvaluatedKey;
     }
 
-    let response = await economyAddrObj.ddbServiceObj.query(queryParams),
-      tokenHolderData = response.data.Items;
+    let response = await economyAddrObj.ddbServiceObj.query(queryParams);
+    if (response.isFailure()) {
+      return Promise.reject(response);
+    }
+
+    let tokenHolderData = response.data.Items;
 
     let result = [];
     for (let i = 0; i < tokenHolderData.length; i++) {
