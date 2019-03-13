@@ -23,6 +23,7 @@ OST Block Scanner parses Ethereum-based chains and stores data in DynamoDB. It s
 - [Geth](https://github.com/ethereum/go-ethereum/) >=1.8.17
 - [Memcached](https://memcached.org/)
 - AWS DynamoDB Service OR [DynamoDBLocal.jar](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.DownloadingAndRunning.html)
+- [Java](https://www.java.com/) >= 6.0, if using DynamoDBLocal.jar
 - [DB Browser for SQLite](https://sqlitebrowser.org/) optionally to browse DynamoDB
     
 #### 2. Run DynamoDBLocal.jar, if you are not using AWS DynamoDB Service
@@ -34,7 +35,7 @@ OST Block Scanner parses Ethereum-based chains and stores data in DynamoDB. It s
 ```
 
 #### 3. Create OST Block Scanner config file
-Refer to ./node_modules/@ostdotcom/ost-block-scanner/config.json.example to create a new configuration file.
+Refer to [config.json.example](config.json.example) to create a new configuration file.
 
 Set `CONFIG_STRATEGY_PATH` environment variable to the path of the configuration file just created.
 
