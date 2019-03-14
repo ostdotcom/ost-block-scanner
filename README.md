@@ -80,8 +80,8 @@ Set `CONFIG_STRATEGY_PATH` environment variable to the path of the configuration
 ```
     
 ## Start Block Scanner
-  * Mandatory parameters: chainId, configFile
-  * Optional parameters: startBlockNumber, endBlockNumber
+  * Mandatory parameters: `chainId`, `configFile`
+  * Optional parameters: `startBlockNumber`, `endBlockNumber`
 ```bash
   node ./node_modules/@ostdotcom/ost-block-scanner/executables/blockScanner.js --configFile $CONFIG_STRATEGY_PATH --chainId 2000 --startBlockNumber 0 --endBlockNumber 100
 ```
