@@ -36,7 +36,6 @@ class AddChain {
    * @param {Number} params.chainId
    * @param {Number} params.networkId
    * @param {Object} params.blockShardCount
-   * @param {Object} params.economyShardCount
    * @param {Object} params.economyAddressShardCount
    * @param {Object} params.transactionShardCount
    *
@@ -49,7 +48,6 @@ class AddChain {
     oThis.networkId = params.networkId;
     oThis.chainIdShardCount = 1; // ChainId shard count is hard coded just to bypass the services common validation.
     oThis.blockShardCount = params.blockShardCount || 1;
-    oThis.economyShardCount = params.economyShardCount || 1;
     oThis.economyAddressShardCount = params.economyAddressShardCount || 1;
     oThis.transactionShardCount = params.transactionShardCount || 1;
   }

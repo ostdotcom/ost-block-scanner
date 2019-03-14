@@ -329,7 +329,7 @@ class TransactionParser extends ServiceBase {
       ) {
         // As entry in address transactions didn't went through mark them dirty.
         oThis.unprocessedTransactions = oThis.transactionHashes;
-        oThis._updateTransactions();
+        await oThis._updateTransactions();
       }
     }
     logger.debug('Insert Into address transactions:', Date.now() - startTime);
