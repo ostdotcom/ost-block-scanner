@@ -5,7 +5,6 @@
 [![Downloads per month](https://img.shields.io/npm/dm/@ostdotcom/ost-block-scanner.svg?maxAge=3600)][npm]
 
 [npm]: https://www.npmjs.com/package/@ostdotcom/ost-block-scanner
-[travis]: https://travis-ci.org/ostdotcom/ost-block-scanner
 
 OST Block Scanner parses Ethereum-based chains and stores data in DynamoDB. It supports multiple chains, as well.
 
@@ -45,11 +44,10 @@ Set `CONFIG_STRATEGY_PATH` environment variable to the path of the configuration
   node ./node_modules/@ostdotcom/ost-block-scanner/tools/initialSetup.js --configFile $CONFIG_STRATEGY_PATH
 ```
 
-#### 5. Add a new chain and create chain-specific shared DynamoDB tables:
+### 5. Add a new chain and create chain-specific shared DynamoDB tables:
   * Mandatory parameters: `chainId`, `networkId`, `configFile`
   * Optional parameters (each defaults to 1):
     * `blockShardCount`: number of block shards to be created
-    * `economyShardCount`: number of economy shards to be created
     * `economyAddressShardCount`: number of economy address shards to be created
     * `transactionShardCount`: number of transaction shards to be created
   
@@ -58,7 +56,7 @@ Set `CONFIG_STRATEGY_PATH` environment variable to the path of the configuration
   # Make sure chain configuration is present in config file before starting this step. 
   # Optional parameters are used to create entity-specific sharded tables. 
   # By default only one shard is created for each entity. 
-  node ./node_modules/@ostdotcom/ost-block-scanner/tools/addChain.js --configFile $CONFIG_STRATEGY_PATH --chainId 2000 --networkId 1 --blockShardCount 2 --economyShardCount 2 --economyAddressShardCount 2 --transactionShardCount 2
+  node ./node_modules/@ostdotcom/ost-block-scanner/tools/addChain.js --configFile $CONFIG_STRATEGY_PATH --chainId 2000 --networkId 1 --blockShardCount 2 --economyAddressShardCount 2 --transactionShardCount 2
 ```
 
 ### 6. Add additional shards to existing chains (optional)
@@ -81,15 +79,9 @@ Set `CONFIG_STRATEGY_PATH` environment variable to the path of the configuration
   node ./node_modules/@ostdotcom/ost-block-scanner/tools/createShards/byTransaction.js --configFile $CONFIG_STRATEGY_PATH --chainId 2000 --shardNumber 1
 ```
     
-<<<<<<< HEAD
-# Start Block Scanner
-  * Mandatory parameters: `chainId`, `configFile`
-  * Optional parameters: `startBlockNumber`, `endBlockNumber`
-=======
 ## Start Block Scanner
   * Mandatory parameters: chainId, configFile
   * Optional parameters: startBlockNumber, endBlockNumber
->>>>>>> 08bd867... Readme: update headings for accessibility
 ```bash
   node ./node_modules/@ostdotcom/ost-block-scanner/executables/blockScanner.js --configFile $CONFIG_STRATEGY_PATH --chainId 2000 --startBlockNumber 0 --endBlockNumber 100
 ```
