@@ -315,16 +315,6 @@ const paramErrorConfig = {
     code: 'invalid',
     message: 'Invalid block shard count'
   },
-  missingEconomyShardCount: {
-    parameter: 'economyShardCount',
-    code: 'missing',
-    message: 'Missing economy shard count'
-  },
-  invalidEconomyShardCount: {
-    parameter: 'economyShardCount',
-    code: 'invalid',
-    message: 'Invalid economy shard count'
-  },
   missingEconomyAddressShardCount: {
     parameter: 'economyAddressShardCount',
     code: 'missing',

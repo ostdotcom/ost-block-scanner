@@ -18,7 +18,6 @@ program
   .option('--chainId <chainId>', 'Chain id')
   .option('--networkId <networkId>', 'Network id')
   .option('--blockShardCount [blockShardCount]>', 'Number of block shards to be created')
-  .option('--economyShardCount [economyShardCount]>', 'Number of economy shards to be created')
   .option('--economyAddressShardCount [economyAddressShardCount]', 'Number of economy address shards to be created')
   .option('--transactionShardCount [transactionShardCount]', 'Number of transaction shards to be created')
   .option('--configFile <configFile>', 'Block scanner config strategy absolute file path')
@@ -29,7 +28,7 @@ program.on('--help', () => {
   logger.log('  Example:');
   logger.log('');
   logger.log(
-    "    node tools/addChain.js --chainId 189 --networkId 1 --blockShardCount 1 --economyShardCount 1 --economyAddressShardCount 1 --transactionShardCount 1 --configFile './tests/data/config.json'"
+    "    node tools/addChain.js --chainId 189 --networkId 1 --blockShardCount 1 --economyAddressShardCount 1 --transactionShardCount 1 --configFile './tests/data/config.json'"
   );
   logger.log('');
   logger.log('');
