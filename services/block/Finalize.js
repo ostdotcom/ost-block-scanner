@@ -88,7 +88,7 @@ class Finalize {
   async getBlockToFinalize() {
     const oThis = this,
       ChainCronDataModel = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'ChainCronDataModel'),
-      chainCronDataObj = new ChainCronDataModel({});
+      chainCronDataObj = new ChainCronDataModel({ consistentRead: 1 });
 
     let cronDataRsp = await chainCronDataObj.getCronData(oThis.chainId);
 
