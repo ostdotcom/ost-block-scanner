@@ -380,6 +380,45 @@ class BasicHelperKlass {
 
     return providers;
   }
+
+  /**
+   * Is transaction status success
+   *
+   * @param status
+   * @returns {boolean}
+   */
+  isTransactionStatusSuccess(status) {
+    return status == '0x1' || status;
+  }
+
+  /**
+   * Is transaction status success
+   *
+   * @param status
+   * @returns {boolean}
+   */
+  isTransactionStatusFailed(status) {
+    return status == '0x0' || status == false;
+  }
+
+  /**
+   * Get transaction status for DDB
+   *
+   * @param status
+   * @returns {number}
+   */
+  getTransactionStatusForDB(status) {
+    const oThis = this;
+
+    if (oThis.isTransactionStatusSuccess(status)) {
+      return 1;
+    } else if (oThis.isTransactionStatusFailed(status)) {
+      return 0;
+    } else {
+      // No other status should be set
+      throw 'Transaction Status is not supported (' + status + ')';
+    }
+  }
 }
 
 module.exports = new BasicHelperKlass();
