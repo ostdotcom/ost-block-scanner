@@ -388,7 +388,7 @@ class BasicHelperKlass {
    * @returns {boolean}
    */
   isTransactionStatusSuccess(status) {
-    return status == '0x1' || status;
+    return status == '0x1' || status == true;
   }
 
   /**
