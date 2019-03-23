@@ -204,11 +204,7 @@ class TransactionParser extends ServiceBase {
       let trxReceipt = oThis.transactionReceiptMap[txHash];
 
       let formattedTrxLogResp = new FormatTransactionLogs(trxReceipt).decodeRuleExecuteEvent();
-      logger.info('transaction internal status ', trxReceipt.internalStatus);
-      // if (formattedTrxLogResp.isSuccess()) {
-      //   // Set internal status of transaction
-      //   //trxReceipt.internalStatus = formattedTrxLogResp.data.transactionInternalStatus;
-      // }
+      logger.debug('transaction internal status ', trxReceipt.internalStatus);
     }
 
     logger.debug('Done with decoding Transaction internal status events.', Date.now() - startTime);
