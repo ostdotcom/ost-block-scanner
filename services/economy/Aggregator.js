@@ -200,6 +200,13 @@ class EconomyAggregator extends ServiceBase {
         ] || { totalTransfers: 0, totalBTtransferValue: basicHelper.convertToBigNumber(0), tokenHolders: 0 };
 
         oThis.aggregatedEconomy[transferEvent.contractAddress]['totalTransfers'] += 1;
+        // We don't want to add stake and mint amount and redeem amount to volume.
+        if (
+          transferEvent.fromAddress === coreConstants.zeroAddress ||
+          transferEvent.toAddress === coreConstants.zeroAddress
+        ) {
+          continue;
+        }
         let transferAmount = basicHelper.convertToBigNumber(transferEvent.amount);
         // Add in old value new transfer amount.
         oThis.aggregatedEconomy[transferEvent.contractAddress]['totalBTtransferValue'] = oThis.aggregatedEconomy[
