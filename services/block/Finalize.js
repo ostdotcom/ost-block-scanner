@@ -43,7 +43,7 @@ class Finalize {
     return oThis.asyncPerform().catch(function(err) {
       logger.error(' In catch block of services/block/Finalize');
       return responseHelper.error({
-        internal_error_identifier: 's_f_f_1',
+        internal_error_identifier: 's_b_f_1',
         api_error_identifier: 'something_went_wrong',
         debug_options: err,
         error_config: errorConfig
@@ -72,7 +72,7 @@ class Finalize {
       return responseHelper.successWithData(resp.data);
     } else {
       return responseHelper.error({
-        internal_error_identifier: 's_f_f_2',
+        internal_error_identifier: 's_b_f_2',
         api_error_identifier: 'something_went_wrong',
         debug_options: resp.err,
         error_config: errorConfig
@@ -133,19 +133,21 @@ class Finalize {
   async finalizeBlock() {
     const oThis = this;
 
-    await oThis.checkBlockData();
+    let response = await oThis.checkBlockData();
+
+    if (response.isFailure()) return response;
 
     // Don't check transaction data if reverted already
     if (!oThis.revertedBlock) {
-      await oThis.checkTransactionData();
+      response = await oThis.checkTransactionData();
+
+      if (response.isFailure()) return response;
     }
 
     if (oThis.revertedBlock) {
-      let response = await oThis.reProcessBlock();
+      response = await oThis.reProcessBlock();
 
-      if (response.isFailure()) {
-        return response;
-      }
+      if (response.isFailure()) return response;
     }
 
     return responseHelper.successWithData({
@@ -217,9 +219,7 @@ class Finalize {
 
     let response = await fetchBlockTransactions.perform();
 
-    if (response.isFailure()) {
-      return Promise.reject(response);
-    }
+    if (response.isFailure()) return response;
 
     let dbTransactionsData = response.data.transactionsData,
       blockTransactions = oThis.currentBlockInfo.transactions,
@@ -260,7 +260,10 @@ class Finalize {
         chainId: oThis.chainId,
         rawBlockData: oThis.currentBlockInfo
       });
-    await revertBlock.perform();
+    const resp = await revertBlock.perform();
+    if (resp.isFailure()) {
+      return Promise.reject(resp);
+    }
     oThis.revertedBlock = true;
     return Promise.resolve(responseHelper.successWithData());
   }
@@ -292,7 +295,14 @@ class Finalize {
       nodesWithBlock: blockParserData.nodesWithBlock
     });
 
-    response = await distributeTransactions.perform();
+    response = await distributeTransactions.perform().catch(function(err) {
+      return responseHelper.error({
+        internal_error_identifier: 's_b_f_3',
+        api_error_identifier: 'something_went_wrong',
+        debug_options: err,
+        error_config: errorConfig
+      });
+    });
 
     if (response.isFailure()) {
       return response;
