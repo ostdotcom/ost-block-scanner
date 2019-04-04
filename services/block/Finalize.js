@@ -195,7 +195,8 @@ class Finalize {
 
     // Reversal of block is needed
     if (blockRevertNeeded) {
-      await oThis._revertBlock();
+      const response = await oThis._revertBlock();
+      if (response.isFailure()) return response;
     }
 
     return Promise.resolve(responseHelper.successWithData());
@@ -240,7 +241,8 @@ class Finalize {
 
     // If dirty transactions are present then revert complete block.
     if (dirtyTransactions) {
-      await oThis._revertBlock();
+      const response = await oThis._revertBlock();
+      if (response.isFailure()) return response;
     }
 
     return Promise.resolve(responseHelper.successWithData());
@@ -262,7 +264,7 @@ class Finalize {
       });
     const resp = await revertBlock.perform();
     if (resp.isFailure()) {
-      return Promise.reject(resp);
+      return resp;
     }
     oThis.revertedBlock = true;
     return Promise.resolve(responseHelper.successWithData());
@@ -295,14 +297,7 @@ class Finalize {
       nodesWithBlock: blockParserData.nodesWithBlock
     });
 
-    response = await distributeTransactions.perform().catch(function(err) {
-      return responseHelper.error({
-        internal_error_identifier: 's_b_f_3',
-        api_error_identifier: 'something_went_wrong',
-        debug_options: err,
-        error_config: errorConfig
-      });
-    });
+    response = await distributeTransactions.perform();
 
     if (response.isFailure()) {
       return response;
