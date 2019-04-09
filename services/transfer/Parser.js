@@ -468,7 +468,7 @@ class TokenTransferParser extends ServiceBase {
         })
       );
     } else if (
-      addAddrTrxResponse.data.insertionFailed ||
+      addAddrTrxResponse.data.batchWriteFailed ||
       Object.keys(addAddrTrxResponse.data.economyAddressShardsNotFound).length > 0
     ) {
       // As entry in address transfers didn't went through mark them dirty.
@@ -533,14 +533,13 @@ class TokenTransferParser extends ServiceBase {
     cacheObj.clear();
 
     let AddressBalanceCacheClass = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'AddressBalanceCache');
-    for(let contractAddress in balanceCacheClearMap){
+    for (let contractAddress in balanceCacheClearMap) {
       new AddressBalanceCacheClass({
         chainId: oThis.chainId,
         economyContractAddress: contractAddress,
         addresses: balanceCacheClearMap[contractAddress]
-      }).clear()
+      }).clear();
     }
-
   }
 }
 

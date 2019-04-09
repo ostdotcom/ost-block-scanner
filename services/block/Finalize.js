@@ -32,6 +32,10 @@ class Finalize {
     oThis.chainId = params.chainId;
     oThis.blockDelay = params.blockDelay;
     oThis.revertedBlock = false;
+
+    oThis.currentBlockInfo = null;
+    oThis.blockToProcess = null;
+    oThis.ddbBlockTimestamp = null;
   }
 
   /**
@@ -133,21 +137,21 @@ class Finalize {
   async finalizeBlock() {
     const oThis = this;
 
-    let response = await oThis.checkBlockData();
+    let blockResponse = await oThis.checkBlockData();
 
-    if (response.isFailure()) return response;
+    if (blockResponse.isFailure()) return blockResponse;
 
     // Don't check transaction data if reverted already
     if (!oThis.revertedBlock) {
-      response = await oThis.checkTransactionData();
+      let txResponse = await oThis.checkTransactionData();
 
-      if (response.isFailure()) return response;
+      if (txResponse.isFailure()) return txResponse;
     }
 
     if (oThis.revertedBlock) {
-      response = await oThis.reProcessBlock();
+      let processBlockResponse = await oThis.reProcessBlock();
 
-      if (response.isFailure()) return response;
+      if (processBlockResponse.isFailure()) return processBlockResponse;
     }
 
     return responseHelper.successWithData({
@@ -189,6 +193,10 @@ class Finalize {
         !getBlockDetailsRsp.data[oThis.blockToProcess].blockHash ||
         getBlockDetailsRsp.data[oThis.blockToProcess].blockHash.toLowerCase() !=
           oThis.currentBlockInfo.hash.toLowerCase();
+
+      if (getBlockDetailsRsp.data[oThis.blockToProcess]) {
+        oThis.ddbBlockTimestamp = getBlockDetailsRsp.data[oThis.blockToProcess].blockTimestamp;
+      }
     } else {
       blockRevertNeeded = true;
     }
@@ -199,7 +207,7 @@ class Finalize {
       if (response.isFailure()) return response;
     }
 
-    return Promise.resolve(responseHelper.successWithData());
+    return responseHelper.successWithData();
   }
 
   /**
@@ -245,7 +253,7 @@ class Finalize {
       if (response.isFailure()) return response;
     }
 
-    return Promise.resolve(responseHelper.successWithData());
+    return responseHelper.successWithData();
   }
 
   /**
@@ -260,14 +268,15 @@ class Finalize {
         .getShadowedClassFor(coreConstants.icNameSpace, 'RevertBlockTransactionsData'),
       revertBlock = new RevertBlockTransactionsData({
         chainId: oThis.chainId,
-        rawBlockData: oThis.currentBlockInfo
+        currentBlockData: oThis.currentBlockInfo,
+        ddbBlockTimestamp: oThis.ddbBlockTimestamp
       });
     const resp = await revertBlock.perform();
     if (resp.isFailure()) {
       return resp;
     }
     oThis.revertedBlock = true;
-    return Promise.resolve(responseHelper.successWithData());
+    return responseHelper.successWithData();
   }
 
   /**
