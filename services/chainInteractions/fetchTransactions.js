@@ -129,16 +129,21 @@ class FetchTransactions {
     let getTxReceiptsResponse = await oThis._getTxReceipts(batchedTxHashes, provider);
 
     if (getTxReceiptsResponse.isSuccess()) {
-      Object.assign(oThis.txHashToTxReceiptMap, getTxReceiptsResponse.data);
-    } else {
-      //if current provider does not return the receipt, try on other providers
-      for (let i = 0; i < oThis.providers.length; i++) {
-        let newProvider = oThis.providers[i];
-        if (newProvider == provider) continue;
-        let rsp = await oThis._getTxReceipts(batchedTxHashes, newProvider);
-        if (rsp) {
-          Object.assign(oThis.txHashToTxReceiptMap, rsp.data);
-          break;
+      Object.assign(oThis.txHashToTxReceiptMap, getTxReceiptsResponse.data.transactionReceipts);
+      // If there are transactions whose receipts are not found, then look on other providers.
+      if (getTxReceiptsResponse.data.receiptNotFoundCount > 0) {
+        for (let i = 0; i < oThis.providers.length; i++) {
+          let newProvider = oThis.providers[i];
+          if (newProvider == provider) continue;
+          logger.debug(`TxReceiptsForBatch: Batch No :${batchNo} with Provider: ${newProvider}`);
+          let rsp = await oThis._getTxReceipts(batchedTxHashes, newProvider);
+          if (rsp.isSuccess()) {
+            Object.assign(oThis.txHashToTxReceiptMap, rsp.data.transactionReceipts);
+            // As all the receipts of batch are found then no need to check on other providers.
+            if (rsp.data.receiptNotFoundCount === 0) {
+              break;
+            }
+          }
         }
       }
     }
@@ -162,7 +167,8 @@ class FetchTransactions {
     return new Promise(function(onResolve, onReject) {
       const totalCount = batchedTxHashes.length;
 
-      let count = 0;
+      let count = 0,
+        receiptNotFoundCount = 0;
 
       const requestCallback = function(err, result) {
         if (err) {
@@ -176,10 +182,17 @@ class FetchTransactions {
           result.to = result.to ? result.to.toLowerCase() : '';
           result.contractAddress = result.contractAddress ? result.contractAddress.toLowerCase() : '';
           txHashToReceiptsMap[result.transactionHash] = result;
+        } else {
+          receiptNotFoundCount++;
         }
 
         if (count === totalCount) {
-          onResolve(responseHelper.successWithData(txHashToReceiptsMap));
+          onResolve(
+            responseHelper.successWithData({
+              transactionReceipts: txHashToReceiptsMap,
+              receiptNotFoundCount: receiptNotFoundCount
+            })
+          );
         }
       };
 
