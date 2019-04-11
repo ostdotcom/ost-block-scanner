@@ -68,7 +68,7 @@ class Finalize {
 
     let resp = await oThis.validateBlockToProcess(blockToProcess);
 
-    if (resp.data.blockProcessable) {
+    if (resp.isSuccess() && resp.data.blockProcessable) {
       resp = await oThis.finalizeBlock();
     }
 
@@ -170,7 +170,7 @@ class Finalize {
     const oThis = this,
       ShardByBlockModel = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'ShardByBlockModel'),
       BlockModel = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'BlockModel'),
-      shardByBlockObj = new ShardByBlockModel({});
+      shardByBlockObj = new ShardByBlockModel({ consistentRead: 1 });
 
     let shardByBlockRsp = await shardByBlockObj.getBlock({
       chainId: oThis.chainId,
@@ -184,11 +184,13 @@ class Finalize {
     if (shardByBlocksRow['blockNumber']) {
       let blockModel = new BlockModel({
           chainId: oThis.chainId,
-          shardIdentifier: shardByBlocksRow.shardIdentifier
+          shardIdentifier: shardByBlocksRow.shardIdentifier,
+          consistentRead: 1
         }),
         getBlockDetailsRsp = await blockModel.getBlockDetails([oThis.blockToProcess]);
       // Block revert is needed if block data is not found in Db or block hash is not matching.
       blockRevertNeeded =
+        getBlockDetailsRsp.isFailure() ||
         !getBlockDetailsRsp.data[oThis.blockToProcess] ||
         !getBlockDetailsRsp.data[oThis.blockToProcess].blockHash ||
         getBlockDetailsRsp.data[oThis.blockToProcess].blockHash.toLowerCase() !=
@@ -240,7 +242,11 @@ class Finalize {
         let transactionHash = blockTransactions[index];
         // If transaction from block chain is not present in db OR
         // Transactions are present in db but not completely inserted in all tables.
-        if (!dbTransactionsData[transactionHash] || dbTransactionsData[transactionHash].eventsParsingStatus != 0) {
+        if (
+          !dbTransactionsData[transactionHash] ||
+          dbTransactionsData[transactionHash].blockNumber != oThis.blockToProcess ||
+          dbTransactionsData[transactionHash].eventsParsingStatus != 0
+        ) {
           dirtyTransactions = true;
           break;
         }
