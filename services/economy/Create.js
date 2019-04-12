@@ -29,56 +29,52 @@ class CreateEconomyService extends ServicesBase {
    *
    * @augments ServicesBase
    *
-   * @param {Number} chainId
-   * @param {Number} decimals
-   * @param {String} contractAddress
-   * @param {String} gatewayContractAddress
-   * @param {String} provider
+   * @param {Object} economyParams
+   * @param {Object} extraStorageParams
    * @param {Number} blockTimestamp
-   * @param {String} displayName
-   * @param {String} conversionFactor
-   * @param {String} symbol
-   * @param {String} originContractAddress
+   * @param {String} provider
+   * @param {Number} economyParams.chainId
+   * @param {Number} economyParams.decimals
+   * @param {String} economyParams.contractAddress
+   * @param {String} economyParams.displayName
+   * @param {String} economyParams.conversionFactor
+   * @param {String} economyParams.symbol
+   * @param {String} extraStorageParams.gatewayContractAddress
+   * @param {String} extraStorageParams.originContractAddress
+   *
    * @constructor
    */
   constructor(
-    chainId,
-    decimals,
-    contractAddress,
-    gatewayContractAddress,
-    provider,
+    economyParams,
+    extraStorageParams,
     blockTimestamp,
-    displayName,
-    conversionFactor,
-    symbol,
-    originContractAddress
+    provider
   ) {
     const params = {
-      chainId: chainId,
-      decimals: decimals,
-      contractAddress: contractAddress,
-      gatewayContractAddress: gatewayContractAddress,
+      chainId: economyParams.chainId,
+      decimals: economyParams.decimals,
+      contractAddress: economyParams.contractAddress,
       provider: provider,
-      blockTimestamp: blockTimestamp,
-      displayName: displayName,
-      conversionFactor: conversionFactor,
-      symbol: symbol,
-      originContractAddress: originContractAddress
+      displayName: economyParams.displayName,
+      conversionFactor: economyParams.conversionFactor,
+      symbol: economyParams.symbol
     };
+
+    Object.assign(params, extraStorageParams);
+
     super(params, serviceType);
 
     const oThis = this;
 
-    oThis.chainId = chainId;
-    oThis.decimals = decimals;
-    oThis.contractAddress = contractAddress;
+    oThis.chainId = economyParams.chainId;
+    oThis.decimals = economyParams.decimals;
+    oThis.contractAddress = economyParams.contractAddress;
+    oThis.displayName = economyParams.displayName;
+    oThis.conversionFactor = economyParams.conversionFactor;
+    oThis.symbol = economyParams.symbol;
     oThis.provider = provider;
-    oThis.gatewayContractAddress = gatewayContractAddress;
     oThis.blockTimestamp = blockTimestamp;
-    oThis.displayName = displayName;
-    oThis.conversionFactor = conversionFactor;
-    oThis.symbol = symbol;
-    oThis.originContractAddress = originContractAddress;
+    oThis.extraStorageParams = extraStorageParams;
   }
 
   /**
@@ -116,11 +112,9 @@ class CreateEconomyService extends ServicesBase {
         decimals: oThis.decimals,
         displayName: oThis.displayName,
         conversionFactor: oThis.conversionFactor,
-        symbol: oThis.symbol,
-        gatewayContractAddress: oThis.gatewayContractAddress,
-        originContractAddress: oThis.originContractAddress
+        symbol: oThis.symbol
       },
-      createEconomyObj = new createEconomyKlass(mandatoryParams, optionalParams);
+      createEconomyObj = new createEconomyKlass(mandatoryParams, oThis.extraStorageParams, optionalParams);
 
     await createEconomyObj.perform();
   }
