@@ -44,12 +44,7 @@ class CreateEconomyService extends ServicesBase {
    *
    * @constructor
    */
-  constructor(
-    economyParams,
-    extraStorageParams,
-    blockTimestamp,
-    provider
-  ) {
+  constructor(economyParams, extraStorageParams, blockTimestamp, provider) {
     const params = {
       chainId: economyParams.chainId,
       decimals: economyParams.decimals,
@@ -57,7 +52,8 @@ class CreateEconomyService extends ServicesBase {
       provider: provider,
       displayName: economyParams.displayName,
       conversionFactor: economyParams.conversionFactor,
-      symbol: economyParams.symbol
+      symbol: economyParams.symbol,
+      blockTimestamp: blockTimestamp
     };
 
     Object.assign(params, extraStorageParams);
