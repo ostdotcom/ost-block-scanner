@@ -351,13 +351,14 @@ class TokenTransferParser extends ServiceBase {
         new Promise(function(onResolve, onReject) {
           tokenTrxModelObj
             .batchWriteItem(insertParams[shardId])
-            .then(function(resp) {
-              oThis._clearTransfersCache(insertParams[shardId]);
+            .then(async function(resp) {
               if (!resp || resp.isFailure()) {
                 logger.debug('Token transfers insertion failed ', resp);
                 for (let index in insertParams[shardId]) {
                   oThis.insertionFailedTransactions.push(insertParams[shardId][index].transactionHash);
                 }
+              } else {
+                await oThis._resetTransfersRelatedCache(insertParams[shardId]);
               }
               onResolve();
             })
@@ -509,7 +510,7 @@ class TokenTransferParser extends ServiceBase {
    *
    * @returns {Promise<void>}
    */
-  _clearTransfersCache(transferRows) {
+  async _resetTransfersRelatedCache(transferRows) {
     const oThis = this;
 
     let eventIndexMap = {},
@@ -530,17 +531,16 @@ class TokenTransferParser extends ServiceBase {
         transactionHashEventIndexesMap: eventIndexMap
       });
 
-    cacheObj.clear();
+    await cacheObj.setTransfersCache(transferRows);
 
     let AddressBalanceCacheClass = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'AddressBalanceCache');
-    for(let contractAddress in balanceCacheClearMap){
+    for (let contractAddress in balanceCacheClearMap) {
       new AddressBalanceCacheClass({
         chainId: oThis.chainId,
         economyContractAddress: contractAddress,
         addresses: balanceCacheClearMap[contractAddress]
-      }).clear()
+      }).clear();
     }
-
   }
 }
 
