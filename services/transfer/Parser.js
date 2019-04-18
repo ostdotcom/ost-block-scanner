@@ -469,7 +469,7 @@ class TokenTransferParser extends ServiceBase {
         })
       );
     } else if (
-      addAddrTrxResponse.data.insertionFailed ||
+      addAddrTrxResponse.data.batchWriteFailed ||
       Object.keys(addAddrTrxResponse.data.economyAddressShardsNotFound).length > 0
     ) {
       // As entry in address transfers didn't went through mark them dirty.
