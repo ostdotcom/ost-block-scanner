@@ -150,7 +150,10 @@ class EconomyAggregator extends ServiceBase {
       Date.now() - startTime
     );
 
-    return responseHelper.successWithData({ aggregatedEconomy: oThis.aggregatedEconomy });
+    oThis.aggregatedEconomy = {};
+    oThis.economyAddressTransfersMap = {};
+
+    return responseHelper.successWithData({});
   }
 
   /**
@@ -221,7 +224,7 @@ class EconomyAggregator extends ServiceBase {
    *
    * @returns {Object<responseHelper>}
    */
-  _updateTotalTransactionsForAddresses() {
+  async _updateTotalTransactionsForAddresses() {
     const oThis = this;
 
     // Format data as economy address transactions and economy address transfers
@@ -237,12 +240,17 @@ class EconomyAggregator extends ServiceBase {
         promises.push(oThis._addTransactionCountInAddresses(userAddr, economyAddr, txCount));
         // To Avoid bombarding dynamo putting sleep after certain batch.
         if (requestCount % batchPagination === 0) {
-          util.sleep(batchPagination);
+          // util.sleep(batchPagination);
+          await Promise.all(promises);
+          promises = [];
         }
         requestCount += 1;
       }
     }
-    return promises;
+    if (promises.length > 0) {
+      await Promise.all(promises);
+    }
+    return responseHelper.successWithData({});
   }
 
   /**
@@ -250,7 +258,7 @@ class EconomyAggregator extends ServiceBase {
    *
    * @returns {Object<responseHelper>}
    */
-  _updateTotalTransfersForAddresses() {
+  async _updateTotalTransfersForAddresses() {
     const oThis = this;
 
     // Format data as economy address transactions and economy address transfers
@@ -268,12 +276,17 @@ class EconomyAggregator extends ServiceBase {
         promisesArr.push(oThis._addTransactionCountInAddresses(userAddr, economyAddr, transfersCount));
         // To Avoid bombarding dynamo putting sleep after certain batch.
         if (requestCount % batchPagination === 0) {
-          util.sleep(batchPagination);
+          // util.sleep(batchPagination);
+          await Promise.all(promisesArr);
+          promisesArr = [];
         }
         requestCount += 1;
       }
     }
-    return promisesArr;
+    if (promisesArr.length > 0) {
+      await Promise.all(promisesArr);
+    }
+    return responseHelper.successWithData({});
   }
 
   /**
