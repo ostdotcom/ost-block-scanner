@@ -224,7 +224,7 @@ class Finalize {
     let fetchBlockTransactions = new FetchBlockTransactions(
       oThis.chainId,
       oThis.blockToProcess,
-      oThis.currentBlockInfo.timestamp,
+      oThis.ddbBlockTimestamp,
       false
     );
 
@@ -248,6 +248,11 @@ class Finalize {
           dbTransactionsData[transactionHash].eventsParsingStatus != 0
         ) {
           dirtyTransactions = true;
+          if (dbTransactionsData[transactionHash].blockNumber < oThis.blockToProcess) {
+            throw 'Transaction found by finalizer in current block, ' +
+              'but block in transaction is already finalized ' +
+              transactionHash;
+          }
           break;
         }
       }
