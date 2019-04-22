@@ -192,9 +192,8 @@ class EconomyAggregator extends ServiceBase {
 
     // Loop on all transfers of block
     for (let txHash in oThis.tokenTransfersMap) {
-      let tokenTransfers = oThis.tokenTransfersMap[txHash];
-      for (let i = 0; i < tokenTransfers.length; i++) {
-        let transferEvent = tokenTransfers[i];
+      let tokenTransfers = oThis.tokenTransfersMap[txHash].transfers;
+      for (let transferEvent in tokenTransfers) {
         let erc20 = transferEvent.contractAddress;
 
         oThis.aggregatedEconomy[erc20] = oThis.aggregatedEconomy[erc20] || {
