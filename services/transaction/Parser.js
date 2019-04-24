@@ -321,7 +321,7 @@ class TransactionParser extends ServiceBase {
           })
         );
       } else if (
-        addAddrTrxResponse.data.insertionFailed ||
+        addAddrTrxResponse.data.batchWriteFailed ||
         Object.keys(addAddrTrxResponse.data.economyAddressShardsNotFound).length > 0
       ) {
         // As entry in address transactions didn't went through mark them dirty.

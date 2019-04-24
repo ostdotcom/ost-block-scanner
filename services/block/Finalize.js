@@ -32,6 +32,10 @@ class Finalize {
     oThis.chainId = params.chainId;
     oThis.blockDelay = params.blockDelay;
     oThis.revertedBlock = false;
+
+    oThis.currentBlockInfo = null;
+    oThis.blockToProcess = null;
+    oThis.ddbBlockTimestamp = null;
   }
 
   /**
@@ -64,7 +68,7 @@ class Finalize {
 
     let resp = await oThis.validateBlockToProcess(blockToProcess);
 
-    if (resp.data.blockProcessable) {
+    if (resp.isSuccess() && resp.data.blockProcessable) {
       resp = await oThis.finalizeBlock();
     }
 
@@ -133,21 +137,21 @@ class Finalize {
   async finalizeBlock() {
     const oThis = this;
 
-    let response = await oThis.checkBlockData();
+    let blockResponse = await oThis.checkBlockData();
 
-    if (response.isFailure()) return response;
+    if (blockResponse.isFailure()) return blockResponse;
 
     // Don't check transaction data if reverted already
     if (!oThis.revertedBlock) {
-      response = await oThis.checkTransactionData();
+      let txResponse = await oThis.checkTransactionData();
 
-      if (response.isFailure()) return response;
+      if (txResponse.isFailure()) return txResponse;
     }
 
     if (oThis.revertedBlock) {
-      response = await oThis.reProcessBlock();
+      let processBlockResponse = await oThis.reProcessBlock();
 
-      if (response.isFailure()) return response;
+      if (processBlockResponse.isFailure()) return processBlockResponse;
     }
 
     return responseHelper.successWithData({
@@ -166,7 +170,7 @@ class Finalize {
     const oThis = this,
       ShardByBlockModel = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'ShardByBlockModel'),
       BlockModel = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'BlockModel'),
-      shardByBlockObj = new ShardByBlockModel({});
+      shardByBlockObj = new ShardByBlockModel({ consistentRead: 1 });
 
     let shardByBlockRsp = await shardByBlockObj.getBlock({
       chainId: oThis.chainId,
@@ -180,15 +184,21 @@ class Finalize {
     if (shardByBlocksRow['blockNumber']) {
       let blockModel = new BlockModel({
           chainId: oThis.chainId,
-          shardIdentifier: shardByBlocksRow.shardIdentifier
+          shardIdentifier: shardByBlocksRow.shardIdentifier,
+          consistentRead: 1
         }),
         getBlockDetailsRsp = await blockModel.getBlockDetails([oThis.blockToProcess]);
       // Block revert is needed if block data is not found in Db or block hash is not matching.
       blockRevertNeeded =
+        getBlockDetailsRsp.isFailure() ||
         !getBlockDetailsRsp.data[oThis.blockToProcess] ||
         !getBlockDetailsRsp.data[oThis.blockToProcess].blockHash ||
         getBlockDetailsRsp.data[oThis.blockToProcess].blockHash.toLowerCase() !=
           oThis.currentBlockInfo.hash.toLowerCase();
+
+      if (getBlockDetailsRsp.data[oThis.blockToProcess]) {
+        oThis.ddbBlockTimestamp = getBlockDetailsRsp.data[oThis.blockToProcess].blockTimestamp;
+      }
     } else {
       blockRevertNeeded = true;
     }
@@ -199,7 +209,7 @@ class Finalize {
       if (response.isFailure()) return response;
     }
 
-    return Promise.resolve(responseHelper.successWithData());
+    return responseHelper.successWithData();
   }
 
   /**
@@ -214,7 +224,7 @@ class Finalize {
     let fetchBlockTransactions = new FetchBlockTransactions(
       oThis.chainId,
       oThis.blockToProcess,
-      oThis.currentBlockInfo.timestamp,
+      oThis.ddbBlockTimestamp,
       false
     );
 
@@ -232,8 +242,17 @@ class Finalize {
         let transactionHash = blockTransactions[index];
         // If transaction from block chain is not present in db OR
         // Transactions are present in db but not completely inserted in all tables.
-        if (!dbTransactionsData[transactionHash] || dbTransactionsData[transactionHash].eventsParsingStatus != 0) {
+        if (
+          !dbTransactionsData[transactionHash] ||
+          dbTransactionsData[transactionHash].blockNumber != oThis.blockToProcess ||
+          dbTransactionsData[transactionHash].eventsParsingStatus != 0
+        ) {
           dirtyTransactions = true;
+          if (dbTransactionsData[transactionHash].blockNumber < oThis.blockToProcess) {
+            throw 'Transaction found by finalizer in current block, ' +
+              'but block in transaction is already finalized ' +
+              transactionHash;
+          }
           break;
         }
       }
@@ -245,7 +264,7 @@ class Finalize {
       if (response.isFailure()) return response;
     }
 
-    return Promise.resolve(responseHelper.successWithData());
+    return responseHelper.successWithData();
   }
 
   /**
@@ -260,14 +279,15 @@ class Finalize {
         .getShadowedClassFor(coreConstants.icNameSpace, 'RevertBlockTransactionsData'),
       revertBlock = new RevertBlockTransactionsData({
         chainId: oThis.chainId,
-        rawBlockData: oThis.currentBlockInfo
+        currentBlockData: oThis.currentBlockInfo,
+        ddbBlockTimestamp: oThis.ddbBlockTimestamp
       });
     const resp = await revertBlock.perform();
     if (resp.isFailure()) {
       return resp;
     }
     oThis.revertedBlock = true;
-    return Promise.resolve(responseHelper.successWithData());
+    return responseHelper.successWithData();
   }
 
   /**
