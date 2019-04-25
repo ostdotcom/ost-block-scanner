@@ -16,6 +16,8 @@ const InstanceComposer = OSTBase.InstanceComposer;
 
 // Following require(s) for registering into instance composer
 require(rootPrefix + '/lib/cacheMultiManagement/chainSpecific/TransactionDetail');
+require(rootPrefix + '/lib/cacheMultiManagement/chainSpecific/TransactionDetailFromGeth');
+require(rootPrefix + '/lib/formatter/config');
 
 // Define serviceType for getting signature.
 const serviceType = serviceTypes.TransactionExtendedDetails;
@@ -79,9 +81,23 @@ class GetTransactionExtendedDetail extends ServicesBase {
         transactionHashes: oThis.transactionHashes,
         transactionHashToShardIdentifierMap: oThis.transactionHashToShardIdentifierMap,
         consistentRead: oThis.consistentRead
-      },
-      TransactionDetailCacheClass = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'TransactionDetailCache'),
-      transactionDetailCacheObj = new TransactionDetailCacheClass(paramsForTransaction),
+      };
+
+    let TransactionDetailCacheClass = null;
+
+    // If data source for transaction details is from chain, then fetch details directly from Geth.
+    const configFormatter = oThis.ic().getInstanceFor(coreConstants.icNameSpace, 'configFormatter'),
+      transactionDetailsDataSource = configFormatter.getDataSourceConfigFor('transactionDetails');
+
+    if (transactionDetailsDataSource == 'chain') {
+      TransactionDetailCacheClass = oThis
+        .ic()
+        .getShadowedClassFor(coreConstants.icNameSpace, 'TransactionDetailFromGethCache');
+    } else {
+      TransactionDetailCacheClass = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'TransactionDetailCache');
+    }
+
+    let transactionDetailCacheObj = new TransactionDetailCacheClass(paramsForTransaction),
       transactionHashDetails = await transactionDetailCacheObj.fetch();
 
     if (transactionHashDetails.isFailure()) {

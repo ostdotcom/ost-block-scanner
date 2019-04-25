@@ -18,7 +18,7 @@ const errorConfig = basicHelper.getErrorConfig();
  *
  * @class
  */
-class ServicesBaseKlass {
+class ServicesBase {
   /**
    * Constructor for base class service
    *
@@ -231,4 +231,4 @@ class ServicesBaseKlass {
   }
 }
 
-module.exports = ServicesBaseKlass;
+module.exports = ServicesBase;

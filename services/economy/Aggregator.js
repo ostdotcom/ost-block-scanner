@@ -4,11 +4,9 @@
  *
  * @module services/economy/Aggregator
  */
-const OSTBase = require('@ostdotcom/base'),
-  InstanceComposer = OSTBase.InstanceComposer;
+const OSTBase = require('@ostdotcom/base');
 
 const rootPrefix = '../..',
-  util = require(rootPrefix + '/lib/util'),
   ServiceBase = require(rootPrefix + '/services/Base'),
   basicHelper = require(rootPrefix + '/helpers/basic'),
   coreConstants = require(rootPrefix + '/config/coreConstants'),
@@ -17,10 +15,9 @@ const rootPrefix = '../..',
   serviceTypes = require(rootPrefix + '/lib/globalConstant/serviceTypes'),
   formatTransactionsData = require(rootPrefix + '/lib/economyAddresses/FormatTransactionsData');
 
-// Define serviceType for getting signature.
-const serviceType = serviceTypes.EconomyAggregator;
-
-const errorConfig = basicHelper.getErrorConfig(),
+const serviceType = serviceTypes.EconomyAggregator,
+  InstanceComposer = OSTBase.InstanceComposer,
+  errorConfig = basicHelper.getErrorConfig(),
   batchPagination = 80;
 
 // Following require(s) for registering into instance composer
@@ -83,6 +80,7 @@ class EconomyAggregator extends ServiceBase {
     if (blockResponse.isFailure()) {
       return blockResponse;
     }
+
     // Transactions are not present in block
     if (oThis.totalTransactions === 0) {
       logger.info(
@@ -95,13 +93,10 @@ class EconomyAggregator extends ServiceBase {
     }
 
     // Fetch transactions and transfers of block
-    let fetchTrxKlass = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'FetchBlockTransactions'),
-      fetchTrxResp = await new fetchTrxKlass(oThis.chainId, oThis.blockNumber, oThis.blockTimestamp, true).perform();
+    let FetchTx = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'FetchBlockTransactions'),
+      fetchTxResp = await new FetchTx(oThis.chainId, oThis.blockNumber, oThis.blockTimestamp, true).perform();
 
-    if (
-      fetchTrxResp.isFailure() ||
-      oThis.totalTransactions !== Object.keys(fetchTrxResp.data.transactionsData).length
-    ) {
+    if (fetchTxResp.isFailure() || oThis.totalTransactions !== Object.keys(fetchTxResp.data.transactionsData).length) {
       return responseHelper.error({
         internal_error_identifier: 's_e_a_2',
         api_error_identifier: 'something_went_wrong',
@@ -116,11 +111,13 @@ class EconomyAggregator extends ServiceBase {
       Date.now() - startTime
     );
 
-    oThis.transactionsMap = fetchTrxResp.data.transactionsData;
-    oThis.tokenTransfersMap = fetchTrxResp.data.tokenTransfers;
+    oThis.transactionsMap = fetchTxResp.data.transactionsData;
+    oThis.tokenTransfersMap = fetchTxResp.data.tokenTransfers;
 
-    let shardEconomyAddrModel = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'ShardByEconomyAddressModel');
-    oThis.shardEconomyAddrModelObj = new shardEconomyAddrModel({ consistentRead: oThis.consistentRead });
+    let ShardByEconomyAddressModel = oThis
+      .ic()
+      .getShadowedClassFor(coreConstants.icNameSpace, 'ShardByEconomyAddressModel');
+    oThis.shardEconomyAddrModelObj = new ShardByEconomyAddressModel({ consistentRead: oThis.consistentRead });
 
     // Aggregate transfers data as economy
     oThis._aggregateEconomyTransfersData();
@@ -150,7 +147,10 @@ class EconomyAggregator extends ServiceBase {
       Date.now() - startTime
     );
 
-    return responseHelper.successWithData({ aggregatedEconomy: oThis.aggregatedEconomy });
+    oThis.aggregatedEconomy = {};
+    oThis.economyAddressTransfersMap = {};
+
+    return responseHelper.successWithData({});
   }
 
   /**
@@ -192,26 +192,32 @@ class EconomyAggregator extends ServiceBase {
 
     // Loop on all transfers of block
     for (let txHash in oThis.tokenTransfersMap) {
-      let tokenTransfers = oThis.tokenTransfersMap[txHash];
-      for (let i = 0; i < tokenTransfers.length; i++) {
-        let transferEvent = tokenTransfers[i];
-        oThis.aggregatedEconomy[transferEvent.contractAddress] = oThis.aggregatedEconomy[
-          transferEvent.contractAddress
-        ] || { totalTransfers: 0, totalBTtransferValue: basicHelper.convertToBigNumber(0), tokenHolders: 0 };
+      let tokenTransfers = oThis.tokenTransfersMap[txHash].transfers;
+      for (let transferEvent in tokenTransfers) {
+        let erc20 = transferEvent.contractAddress;
 
-        oThis.aggregatedEconomy[transferEvent.contractAddress]['totalTransfers'] += 1;
-        // We don't want to add stake and mint amount and redeem amount to volume.
+        oThis.aggregatedEconomy[erc20] = oThis.aggregatedEconomy[erc20] || {
+          totalTransfers: 0,
+          totalBTtransferValue: basicHelper.convertToBigNumber(0),
+          tokenHolders: 0
+        };
+
+        // Add total transfers
+        oThis.aggregatedEconomy[erc20]['totalTransfers'] += 1;
+
+        // We won't consider transfers which have 0x000... address in to or from in transfer for calculation of volume
         if (
           transferEvent.fromAddress === coreConstants.zeroAddress ||
           transferEvent.toAddress === coreConstants.zeroAddress
         ) {
           continue;
         }
+
+        // Add to volume
         let transferAmount = basicHelper.convertToBigNumber(transferEvent.amount);
-        // Add in old value new transfer amount.
-        oThis.aggregatedEconomy[transferEvent.contractAddress]['totalBTtransferValue'] = oThis.aggregatedEconomy[
-          transferEvent.contractAddress
-        ]['totalBTtransferValue'].add(transferAmount);
+        oThis.aggregatedEconomy[erc20]['totalBTtransferValue'] = oThis.aggregatedEconomy[erc20][
+          'totalBTtransferValue'
+        ].add(transferAmount);
       }
     }
   }
@@ -221,7 +227,7 @@ class EconomyAggregator extends ServiceBase {
    *
    * @returns {Object<responseHelper>}
    */
-  _updateTotalTransactionsForAddresses() {
+  async _updateTotalTransactionsForAddresses() {
     const oThis = this;
 
     // Format data as economy address transactions and economy address transfers
@@ -235,14 +241,21 @@ class EconomyAggregator extends ServiceBase {
       for (let userAddr in economyAddressTransactionsMap[economyAddr]) {
         let txCount = Object.keys(economyAddressTransactionsMap[economyAddr][userAddr]).length;
         promises.push(oThis._addTransactionCountInAddresses(userAddr, economyAddr, txCount));
-        // To Avoid bombarding dynamo putting sleep after certain batch.
+
         if (requestCount % batchPagination === 0) {
-          util.sleep(batchPagination);
+          await Promise.all(promises);
+          promises = [];
         }
+
         requestCount += 1;
       }
     }
-    return promises;
+
+    if (promises.length > 0) {
+      await Promise.all(promises);
+    }
+
+    return responseHelper.successWithData({});
   }
 
   /**
@@ -250,7 +263,7 @@ class EconomyAggregator extends ServiceBase {
    *
    * @returns {Object<responseHelper>}
    */
-  _updateTotalTransfersForAddresses() {
+  async _updateTotalTransfersForAddresses() {
     const oThis = this;
 
     // Format data as economy address transactions and economy address transfers
@@ -258,22 +271,32 @@ class EconomyAggregator extends ServiceBase {
 
     let promisesArr = [],
       requestCount = 1;
+
     for (let economyAddr in oThis.economyAddressTransfersMap) {
       for (let userAddr in oThis.economyAddressTransfersMap[economyAddr]) {
         let transfersCount = 0;
+
         // Loop on transactions to find out total indexes
         for (let txHash in oThis.economyAddressTransfersMap[economyAddr][userAddr]) {
           transfersCount += oThis.economyAddressTransfersMap[economyAddr][userAddr][txHash].length;
         }
+
         promisesArr.push(oThis._addTransactionCountInAddresses(userAddr, economyAddr, transfersCount));
-        // To Avoid bombarding dynamo putting sleep after certain batch.
+
         if (requestCount % batchPagination === 0) {
-          util.sleep(batchPagination);
+          await Promise.all(promisesArr);
+          promisesArr = [];
         }
+
         requestCount += 1;
       }
     }
-    return promisesArr;
+
+    if (promisesArr.length > 0) {
+      await Promise.all(promisesArr);
+    }
+
+    return responseHelper.successWithData({});
   }
 
   /**
@@ -313,34 +336,36 @@ class EconomyAggregator extends ServiceBase {
   _fetchEconomies() {
     const oThis = this;
 
-    let economyCacheKlass = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'EconomyCache'),
-      economies = Object.keys(oThis.aggregatedEconomy),
+    let EconomyCache = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'EconomyCache'),
+      erc20Addresses = Object.keys(oThis.aggregatedEconomy),
       promisesArray = [];
 
     while (true) {
-      let batchEconomy = economies.splice(0, 100);
+      // Fetch economy data in batches of batchPagination
+      let batchedErc20Addresses = erc20Addresses.splice(0, batchPagination);
 
-      if (batchEconomy.length <= 0) {
+      if (batchedErc20Addresses.length <= 0) {
         break;
       }
 
-      let promise = new economyCacheKlass({
+      let promise = new EconomyCache({
         chainId: oThis.chainId,
-        economyContractAddresses: batchEconomy
+        economyContractAddresses: batchedErc20Addresses
       }).fetch();
 
       promise.then(function(resp) {
         let economiesData = resp.data;
 
-        for (let eachAddress in economiesData) {
-          let ed = economiesData[eachAddress];
-          Object.assign(oThis.aggregatedEconomy[eachAddress], {
+        for (let erc20Address in economiesData) {
+          let ed = economiesData[erc20Address];
+          Object.assign(oThis.aggregatedEconomy[erc20Address], {
             decimals: ed.decimals,
             conversionFactor: ed.conversionFactor,
             balanceMaintainSupport: ed.balanceMaintainSupport
           });
         }
       });
+
       promisesArray.push(promise);
     }
 
@@ -364,15 +389,15 @@ class EconomyAggregator extends ServiceBase {
       let userAddresses = Object.keys(economyUserTransfersMap[economyAddr]);
 
       while (true) {
-        let batchUserAddreses = userAddresses.splice(0, 100);
+        let batchUserAddresses = userAddresses.splice(0, batchPagination);
 
-        if (batchUserAddreses.length <= 0) {
+        if (batchUserAddresses.length <= 0) {
           break;
         }
 
         let promise = new economyAddrCacheKlass({
           economyContractAddress: economyAddr,
-          addresses: batchUserAddreses,
+          addresses: batchUserAddresses,
           chainId: oThis.chainId,
           consistentRead: oThis.consistentRead
         }).fetch();
@@ -407,6 +432,7 @@ class EconomyAggregator extends ServiceBase {
       });
 
     let promises = [];
+
     for (let economyaddr in oThis.aggregatedEconomy) {
       let economy = oThis.aggregatedEconomy[economyaddr],
         deltaTTH = economy.tokenHolders,
