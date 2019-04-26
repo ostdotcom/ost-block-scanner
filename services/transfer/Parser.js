@@ -505,6 +505,13 @@ class TokenTransferParser extends ServiceBase {
     }
   }
 
+  /**
+   * Set or clear transfers related cache on successful writes
+   *
+   * @param transferRows
+   * @returns {Promise<void>}
+   * @private
+   */
   async _resetTransfersRelatedCache(transferRows) {
     const oThis = this;
 
