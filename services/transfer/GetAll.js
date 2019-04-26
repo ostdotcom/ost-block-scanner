@@ -10,14 +10,13 @@ const rootPrefix = '../..',
   coreConstants = require(rootPrefix + '/config/coreConstants'),
   responseHelper = require(rootPrefix + '/lib/formatter/response'),
   logger = require(rootPrefix + '/lib/logger/customConsoleLogger'),
-  paginationLimits = require(rootPrefix + '/lib/globalConstant/paginationLimits'),
   serviceTypes = require(rootPrefix + '/lib/globalConstant/serviceTypes');
 
 const InstanceComposer = OSTBase.InstanceComposer;
 
 // Following require(s) for registering into instance composer
-require(rootPrefix + '/lib/cacheManagement/chainSpecific/TransactionTokenTransfer');
-require(rootPrefix + '/lib/cacheMultiManagement/shared/shardIdentifier/ByTransaction');
+require(rootPrefix + '/lib/cacheMultiManagement/chainSpecific/Transaction');
+require(rootPrefix + '/lib/cacheMultiManagement/chainSpecific/TokenTransfer');
 
 // Define serviceType for getting signature.
 const serviceType = serviceTypes.AllTransferDetails;
@@ -47,8 +46,6 @@ class GetAllTransferDetail extends ServicesBase {
 
     oThis.chainId = chainId.toString();
     oThis.transactionHashes = transactionHashes;
-    oThis.shardTransactionsMap = {};
-    oThis.transactionTransferDetails = {};
   }
 
   /**
@@ -59,161 +56,86 @@ class GetAllTransferDetail extends ServicesBase {
   async asyncPerform() {
     const oThis = this;
 
-    await oThis._fetchTransactionShards();
+    let transactionDetails = await oThis._fetchTransactionDetails();
 
-    await oThis._fetchTokenTransfers();
+    const transactionTransferDetails = await oThis._fetchTokenTransfers(transactionDetails.data);
 
-    return responseHelper.successWithData(oThis.transactionTransferDetails);
+    return responseHelper.successWithData(transactionTransferDetails);
   }
 
   /**
-   * Fetch shards of transactions
+   * Fetch Token transfers for transaction details.
    *
-   * @returns {Promise<Void>}
+   * @param transactionDetails
+   * @returns {Promise<never>}
    * @private
    */
-  async _fetchTransactionShards() {
+  async _fetchTokenTransfers(transactionDetails) {
     const oThis = this;
 
-    let index = 0,
-      promises = [],
-      isError = false,
-      ShardIdentifierByTransactionCache = oThis
-        .ic()
-        .getShadowedClassFor(coreConstants.icNameSpace, 'ShardIdentifierByTransactionCache');
-    while (index < oThis.transactionHashes.length) {
-      let txHashes = oThis.transactionHashes.slice(index, index + ddbQueryBatchSize);
-
-      promises.push(
-        new Promise(function(onResolve, onReject) {
-          new ShardIdentifierByTransactionCache({
-            chainId: oThis.chainId,
-            transactionHashes: txHashes,
-            consistentRead: oThis.consistentRead
-          })
-            .fetch()
-            .then(function(resp) {
-              if (!isError) {
-                isError = resp.isFailure() || !resp.data;
-                for (let txHash in resp.data) {
-                  let shard = resp.data[txHash]['shardIdentifier'];
-                  if (!shard) {
-                    isError = true;
-                    onResolve();
-                  }
-                  oThis.shardTransactionsMap[shard] = oThis.shardTransactionsMap[shard] || [];
-                  oThis.shardTransactionsMap[shard].push(txHash);
-                }
-              }
-              onResolve();
-            })
-            .catch(function(error) {
-              isError = true;
-              onResolve();
-            });
-        })
-      );
-
-      index = index + ddbQueryBatchSize;
+    const transactionEventMap = {};
+    for (let txHash in transactionDetails) {
+      for (let i = 1; i <= transactionDetails[txHash].totalTokenTransfers; i++) {
+        transactionEventMap[txHash] = transactionEventMap[txHash] || [];
+        transactionEventMap[txHash].push(i);
+      }
     }
 
-    await Promise.all(promises);
+    let TransferCache = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'TokenTransferCache');
 
-    if (isError) {
+    let transfersResponse = await new TransferCache({
+      chainId: oThis.chainId,
+      transactionHashEventIndexesMap: transactionEventMap,
+      consistentRead: oThis.consistentRead
+    }).fetch();
+
+    if (transfersResponse.isFailure()) {
+      logger.error('Error in fetching data from Token transfers cache');
       return Promise.reject(
-        responseHelper.paramValidationError({
-          internal_error_identifier: 's_trf_ga_1',
+        responseHelper.error({
+          internal_error_identifier: 's_t_ga_2',
           api_error_identifier: 'something_went_wrong',
-          params_error_identifiers: 'invalidTransactionHashes',
           debug_options: {}
         })
       );
     }
-  }
 
-  /**
-   * Fetch Token transfers
-   *
-   * @returns {Promise<void>}
-   * @private
-   */
-  async _fetchTokenTransfers() {
-    const oThis = this;
-
-    // Putting parallel queries on different sharded transfer tables
-    let promises = [];
-    for (let shardId in oThis.shardTransactionsMap) {
-      promises.push(oThis._fetchTransfersFromShard(shardId));
+    const transactionTransferDetails = {};
+    for (let txHash in transfersResponse.data) {
+      transactionTransferDetails[txHash] = transfersResponse.data[txHash].transfers;
     }
 
-    await Promise.all(promises);
+    return transactionTransferDetails;
   }
 
   /**
-   * Fetch transfers from given shard
+   * This method fetches the transaction details for the given transaction hashes
    *
-   * @param shardIdentifier
-   * @returns {Promise<Void>}
-   * @private
+   * @returns {Promise<*>}
    */
-  async _fetchTransfersFromShard(shardIdentifier) {
+  async _fetchTransactionDetails() {
     const oThis = this,
-      TransactionTokenTransferCache = oThis
-        .ic()
-        .getShadowedClassFor(coreConstants.icNameSpace, 'TransactionTokenTransfer');
+      paramsForTxHashToDetailsCache = {
+        chainId: oThis.chainId,
+        transactionHashes: oThis.transactionHashes,
+        consistentRead: oThis.consistentRead
+      },
+      TxHashToDetailsCache = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'TransactionCache'),
+      TxHashToDetailsCacheObj = new TxHashToDetailsCache(paramsForTxHashToDetailsCache),
+      txHashDetails = await TxHashToDetailsCacheObj.fetch();
 
-    let i = 0;
-    while (i < oThis.shardTransactionsMap[shardIdentifier].length) {
-      // Doing batching here as we don't want to fire many parallel queries on dynamo
-
-      let batchedTxHashes = oThis.shardTransactionsMap[shardIdentifier].slice(i, i + ddbQueryBatchSize),
-        promises = [],
-        isError = false;
-
-      // Firing parallel queries on dynamo sharded transfer table.
-      for (let index in batchedTxHashes) {
-        let txHash = batchedTxHashes[index];
-
-        let paramsForTransactionTokenTransferCache = {
-          chainId: oThis.chainId,
-          transactionHash: txHash,
-          shardIdentifier: shardIdentifier
-        };
-
-        promises.push(
-          new Promise(function(onResolve, onReject) {
-            new TransactionTokenTransferCache(paramsForTransactionTokenTransferCache)
-              .fetch()
-              .then(function(resp) {
-                if (!isError) {
-                  isError = resp.isFailure() || !resp.data;
-                  oThis.transactionTransferDetails[txHash] = resp.data[txHash].transfers;
-                }
-                onResolve();
-              })
-              .catch(function(error) {
-                isError = true;
-                onResolve();
-              });
-          })
-        );
-      }
-
-      await Promise.all(promises);
-
-      if (isError) {
-        logger.error('Error in fetching data from Transaction Token Transfer cache');
-        return Promise.reject(
-          responseHelper.error({
-            internal_error_identifier: 's_trf_ga_2',
-            api_error_identifier: 'something_went_wrong',
-            debug_options: {}
-          })
-        );
-      }
-
-      i = i + ddbQueryBatchSize;
+    if (txHashDetails.isFailure()) {
+      logger.error('Error in fetching data from Transaction cache');
+      return Promise.reject(
+        responseHelper.error({
+          internal_error_identifier: 's_t_ga_1',
+          api_error_identifier: 'something_went_wrong',
+          debug_options: {}
+        })
+      );
     }
+
+    return Promise.resolve(txHashDetails);
   }
 }
 
