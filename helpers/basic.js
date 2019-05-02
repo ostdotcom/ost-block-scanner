@@ -419,6 +419,23 @@ class BasicHelperKlass {
       throw 'Transaction Status is not supported (' + status + ')';
     }
   }
+
+  /**
+   * Checks whether the object is empty or not.
+   *
+   * @param {object} obj
+   *
+   * @return {boolean}
+   */
+  isEmptyObject(obj) {
+    for (const property in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, property)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 }
 
 module.exports = new BasicHelperKlass();
