@@ -57,7 +57,7 @@ class EconomyAggregator extends ServiceBase {
     oThis.blockTimestamp = null;
     oThis.totalTransactions = 0;
     oThis.transactionsMap = null;
-    oThis.tokenTransfersMap = null;
+    oThis.transactionTransfersMap = {};
     oThis.aggregatedEconomy = {};
     oThis.economyAddressTransfersMap = {};
     oThis.consistentRead = 1;
@@ -112,7 +112,14 @@ class EconomyAggregator extends ServiceBase {
     );
 
     oThis.transactionsMap = fetchTxResp.data.transactionsData;
-    oThis.tokenTransfersMap = fetchTxResp.data.tokenTransfers;
+    const tokenTransfers = fetchTxResp.data.tokenTransfers || {};
+    for (let txHash in tokenTransfers) {
+      const transferEvents = (tokenTransfers[txHash] || {}).transfers;
+      for (let transferIndex in transferEvents) {
+        oThis.transactionTransfersMap[txHash] = oThis.transactionTransfersMap[txHash] || [];
+        oThis.transactionTransfersMap[txHash].push(transferEvents[transferIndex]);
+      }
+    }
 
     let ShardByEconomyAddressModel = oThis
       .ic()
@@ -191,10 +198,11 @@ class EconomyAggregator extends ServiceBase {
     const oThis = this;
 
     // Loop on all transfers of block
-    for (let txHash in oThis.tokenTransfersMap) {
-      let tokenTransfers = oThis.tokenTransfersMap[txHash].transfers;
-      for (let transferEvent in tokenTransfers) {
-        let erc20 = transferEvent.contractAddress;
+    for (let txHash in oThis.transactionTransfersMap) {
+      let tokenTransfers = oThis.transactionTransfersMap[txHash];
+      for (let transferIndex in tokenTransfers) {
+        let transferEvent = tokenTransfers[transferIndex],
+          erc20 = transferEvent.contractAddress;
 
         oThis.aggregatedEconomy[erc20] = oThis.aggregatedEconomy[erc20] || {
           totalTransfers: 0,
@@ -267,7 +275,9 @@ class EconomyAggregator extends ServiceBase {
     const oThis = this;
 
     // Format data as economy address transactions and economy address transfers
-    oThis.economyAddressTransfersMap = formatTransactionsData.formatAsEconomyAddressTransfers(oThis.tokenTransfersMap);
+    oThis.economyAddressTransfersMap = formatTransactionsData.formatAsEconomyAddressTransfers(
+      oThis.transactionTransfersMap
+    );
 
     let promisesArr = [],
       requestCount = 1;
@@ -468,7 +478,15 @@ class EconomyAggregator extends ServiceBase {
       promises.push(economyModelObject.ddbServiceObj.updateItem(updateParams));
     }
 
-    return Promise.all(promises);
+    await Promise.all(promises);
+
+    const cacheKlass = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'EconomyCache'),
+      cacheObj = new cacheKlass({
+        chainId: oThis.chainId,
+        economyContractAddresses: Object.keys(oThis.aggregatedEconomy)
+      });
+
+    return cacheObj.clear();
   }
 }
 
