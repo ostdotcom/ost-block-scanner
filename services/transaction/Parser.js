@@ -425,7 +425,7 @@ class TransactionParser extends ServiceBase {
                 onResolve();
               })
               .catch(function(err) {
-                onResolve();
+                onReject();
               });
           })
         );
