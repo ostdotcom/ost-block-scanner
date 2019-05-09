@@ -81,9 +81,7 @@ class CreateEconomyService extends ServicesBase {
   async asyncPerform() {
     const oThis = this;
 
-    let response = await oThis._createEconomy();
-
-    return Promise.resolve(response);
+    return oThis._createEconomy();
   }
 
   /**
@@ -112,7 +110,7 @@ class CreateEconomyService extends ServicesBase {
       },
       createEconomyObj = new createEconomyKlass(mandatoryParams, oThis.extraStorageParams, optionalParams);
 
-    await createEconomyObj.perform();
+    return createEconomyObj.perform();
   }
 }
 
