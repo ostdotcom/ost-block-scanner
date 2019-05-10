@@ -1,6 +1,6 @@
 {
   "name": "@ostdotcom/ost-block-scanner",
-  "version": "1.0.1-beta.5",
+  "version": "1.0.1-beta.8",
   "description": "OST Block Scanner parse ethereum based chains and store data in DynamoDB",
   "main": "index.js",
   "scripts": {
