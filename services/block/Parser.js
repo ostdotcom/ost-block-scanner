@@ -40,6 +40,7 @@ class BlockParser extends ServiceBase {
    * @param {Object} options: optional params
    * @param {Integer} options.blockDelay: Intentional block delay for parsing the block
    * @param {Integer} options.blockToProcess: Block to process
+   * @param {Boolean} options.forceUpdateBlock: Forcefully update block
    *
    * @constructor
    */
@@ -49,7 +50,8 @@ class BlockParser extends ServiceBase {
     let params = {
       chainId: chainId,
       blockToProcess: options.blockToProcess,
-      blockDelay: options.blockDelay
+      blockDelay: options.blockDelay,
+      forceUpdateBlock: options.forceUpdateBlock
     };
 
     super(params, serviceType);
@@ -59,6 +61,7 @@ class BlockParser extends ServiceBase {
     oThis.chainId = chainId;
     oThis.blockToProcess = params.blockToProcess;
     oThis.blockDelay = params.blockDelay || 0;
+    oThis.forceUpdateBlock = params.forceUpdateBlock;
     oThis.currentBlockInfo = null;
   }
 
@@ -102,7 +105,8 @@ class BlockParser extends ServiceBase {
       blockToProcess = oThis.blockToProcess;
     } else {
       // If update or create is required in block shards table
-      if (response.data.isUpdateRequired) {
+      // OR forceUpdateBlock is set true by Finalizer
+      if (response.data.isUpdateRequired || oThis.forceUpdateBlock) {
         await oThis.updateBlockInfoInShard();
       }
       blockToProcess = oThis.blockToProcess + 1;
