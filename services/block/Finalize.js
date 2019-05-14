@@ -300,7 +300,8 @@ class Finalize {
       BlockParser = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'BlockParser'),
       DistributeTransactions = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'DistributeTransactions'),
       blockParser = new BlockParser(oThis.chainId, {
-        blockToProcess: oThis.blockToProcess
+        blockToProcess: oThis.blockToProcess,
+        forceUpdateBlock: true
       });
 
     let response = await blockParser.perform();
