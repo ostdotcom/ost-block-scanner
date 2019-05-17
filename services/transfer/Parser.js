@@ -357,9 +357,10 @@ class TokenTransferParser extends ServiceBase {
                 for (let index in insertParams[shardId]) {
                   oThis.insertionFailedTransactions.push(insertParams[shardId][index].transactionHash);
                 }
-              } else {
-                await oThis._resetTransfersRelatedCache(insertParams[shardId]);
               }
+              // else {
+              //   await oThis._resetTransfersRelatedCache(insertParams[shardId]);
+              // }
               onResolve();
             })
             .catch(function(err) {
@@ -512,38 +513,38 @@ class TokenTransferParser extends ServiceBase {
    * @returns {Promise<void>}
    * @private
    */
-  async _resetTransfersRelatedCache(transferRows) {
-    const oThis = this;
-
-    let eventIndexMap = {},
-      balanceCacheClearMap = {};
-    for (let index in transferRows) {
-      let te = transferRows[index];
-      eventIndexMap[te.transactionHash] = eventIndexMap[te.transactionHash] || [];
-      eventIndexMap[te.transactionHash].push(te.eventIndex);
-
-      balanceCacheClearMap[te.contractAddress] = balanceCacheClearMap[te.contractAddress] || [];
-      balanceCacheClearMap[te.contractAddress].push(te.fromAddress);
-      balanceCacheClearMap[te.contractAddress].push(te.toAddress);
-    }
-
-    let cacheKlass = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'TokenTransferCache'),
-      cacheObj = new cacheKlass({
-        chainId: oThis.chainId,
-        transactionHashEventIndexesMap: eventIndexMap
-      });
-
-    await cacheObj.setTransfersCache(transferRows);
-
-    let AddressBalanceCacheClass = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'AddressBalanceCache');
-    for (let contractAddress in balanceCacheClearMap) {
-      new AddressBalanceCacheClass({
-        chainId: oThis.chainId,
-        economyContractAddress: contractAddress,
-        addresses: balanceCacheClearMap[contractAddress]
-      }).clear();
-    }
-  }
+  // async _resetTransfersRelatedCache(transferRows) {
+  //   const oThis = this;
+  //
+  //   let eventIndexMap = {},
+  //     balanceCacheClearMap = {};
+  //   for (let index in transferRows) {
+  //     let te = transferRows[index];
+  //     eventIndexMap[te.transactionHash] = eventIndexMap[te.transactionHash] || [];
+  //     eventIndexMap[te.transactionHash].push(te.eventIndex);
+  //
+  //     balanceCacheClearMap[te.contractAddress] = balanceCacheClearMap[te.contractAddress] || [];
+  //     balanceCacheClearMap[te.contractAddress].push(te.fromAddress);
+  //     balanceCacheClearMap[te.contractAddress].push(te.toAddress);
+  //   }
+  //
+  //   let cacheKlass = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'TokenTransferCache'),
+  //     cacheObj = new cacheKlass({
+  //       chainId: oThis.chainId,
+  //       transactionHashEventIndexesMap: eventIndexMap
+  //     });
+  //
+  //   await cacheObj.setTransfersCache(transferRows);
+  //
+  //   let AddressBalanceCacheClass = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'AddressBalanceCache');
+  //   for (let contractAddress in balanceCacheClearMap) {
+  //     new AddressBalanceCacheClass({
+  //       chainId: oThis.chainId,
+  //       economyContractAddress: contractAddress,
+  //       addresses: balanceCacheClearMap[contractAddress]
+  //     }).clear();
+  //   }
+  // }
 }
 
 InstanceComposer.registerAsShadowableClass(TokenTransferParser, coreConstants.icNameSpace, 'TokenTransferParser');
