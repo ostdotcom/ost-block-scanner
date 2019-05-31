@@ -74,9 +74,13 @@ class BlockParser extends ServiceBase {
     const oThis = this,
       CheckIfBlockProcessable = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'CheckIfBlockProcessable');
 
+    logger.log('======1111 CheckIfBlockProcessable 111');
+
     // if blockToProcess is not given as a parameter, then get it from the shard_by_blocks table
     if (!oThis.blockToProcess && oThis.blockToProcess != 0) {
+      logger.log('=====Fetching block to be processed.====');
       await oThis.getBlockToBeProcessed();
+      logger.log('=====Block to be processed fetched====');
     }
 
     let checkIfBlockProcessable = new CheckIfBlockProcessable({
@@ -85,7 +89,9 @@ class BlockParser extends ServiceBase {
       blockDelay: oThis.blockDelay
     });
 
+    logger.log('=====Checking if block is processable====');
     let checkIfBlockProcessableRsp = await checkIfBlockProcessable.perform();
+    logger.log('=====Checked if block is processable====', checkIfBlockProcessableRsp);
 
     if (checkIfBlockProcessableRsp.isFailure() || !checkIfBlockProcessableRsp.data.blockProcessable) {
       return responseHelper.successWithData({
@@ -98,8 +104,12 @@ class BlockParser extends ServiceBase {
     oThis.currentBlockInfo = checkIfBlockProcessableRsp.data.blockInfo;
     oThis.nodesWithBlock = checkIfBlockProcessableRsp.data.nodesWithBlock;
 
+    logger.log('=====Calling function insert into shard by blocks====');
+
     let response = await oThis.insertIntoShardByBlocks(),
       blockToProcess;
+
+    logger.log('====insert into shard by blocks function called====', response);
 
     if (response.isFailure()) {
       blockToProcess = oThis.blockToProcess;
@@ -156,7 +166,9 @@ class BlockParser extends ServiceBase {
       consistentRead: true
     });
 
+    logger.log('=====calling get shard identifier function=====');
     oThis.shardIdentifier = await oThis.getShardIdentifier();
+    logger.log('=====get shard identifier function called=====', oThis.shardIdentifier);
 
     logger.debug('====shardIdentifier', oThis.shardIdentifier);
 
@@ -167,8 +179,11 @@ class BlockParser extends ServiceBase {
       shardIdentifier: oThis.shardIdentifier
     };
 
+    logger.log('=====Calling Put Item with params===', insertParams);
     // Insert in shard_by_blocks, don't update.
     let putItemResponse = await oThis.shardByBlockModelObj.putItem(insertParams);
+
+    logger.log('=====Put Item called successfuly===');
 
     // if record already exists, then update only if block hash has changed.
     if (putItemResponse.internalErrorCode.endsWith('ConditionalCheckFailedException')) {
@@ -279,7 +294,11 @@ class BlockParser extends ServiceBase {
 
     let availableShardsCache = new AvailableShardsCache({ consistentRead: oThis.consistentRead });
 
+    logger.log('====availableShardsCache fetch called===');
+
     let response = await availableShardsCache.fetch();
+
+    logger.log('====availableShardsCache fetch called and returned:===', response);
 
     let shardNumbers = response.data.bk;
 
