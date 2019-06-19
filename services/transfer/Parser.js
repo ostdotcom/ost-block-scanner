@@ -425,6 +425,7 @@ class TokenTransferParser extends ServiceBase {
             blockTimestamp: oThis.blockDetails.timestamp,
             isUpdate: alreadyPresent ? 1 : 0
           },
+          {},
           { conversionFactor: economiesData[contractAddress].conversionFactor }
         );
       economyInsertPromise.push(createEconomyObj.perform());
