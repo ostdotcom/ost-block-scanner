@@ -23,6 +23,7 @@ require(rootPrefix + '/lib/models/shared/ShardByBlock');
 require(rootPrefix + '/lib/models/shared/ShardByTransaction');
 require(rootPrefix + '/lib/models/shared/ShardByEconomyAddress');
 require(rootPrefix + '/lib/models/shared/ChainCronData');
+require(rootPrefix + '/lib/models/shared/LatestPricePoint');
 
 program.option('--configFile <configFile>', 'config strategy absolute file path').parse(process.argv);
 
@@ -75,7 +76,8 @@ class InitialSetup {
       ShardByBlock = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'ShardByBlockModel'),
       ShardByTransactions = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'ShardByTransactionModel'),
       ShardByEconomyAddress = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'ShardByEconomyAddressModel'),
-      ChainCronData = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'ChainCronDataModel');
+      ChainCronData = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'ChainCronDataModel'),
+      LatestPricePoint = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'LatestPricePointModel');
 
     let chainObject = new Chain({}),
       shardsObject = new Shards({}),
@@ -83,23 +85,25 @@ class InitialSetup {
       shardByBlockObject = new ShardByBlock({}),
       shardByTransactionsObject = new ShardByTransactions({}),
       shardByEconomyAddressObject = new ShardByEconomyAddress({}),
-      chainCronDataObject = new ChainCronData({});
+      chainCronDataObject = new ChainCronData({}),
+      latestPricePointObject = new LatestPricePoint({});
 
-    // Create Chain table
+    // Create Chain table.
     await chainObject.createTable();
-    // Create Shard table
+    // Create Shard table.
     await shardsObject.createTable();
-    // Create ShardByBlock table
+    // Create ShardByBlock table.
     await shardByBlockObject.createTable();
-    // Create ShardByTransactions table
+    // Create ShardByTransactions table.
     await shardByTransactionsObject.createTable();
     // Create ShardByEconomyAddress table
     await shardByEconomyAddressObject.createTable();
-    // Create Economy table
+    // Create Economy table.
     await economyObject.createTable();
-
-    // Create ChainCronData table
+    // Create ChainCronData table.
     await chainCronDataObject.createTable();
+    // Create LatestPricePoint table.
+    await latestPricePointObject.createTable();
   }
 }
 
