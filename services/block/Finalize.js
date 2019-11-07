@@ -148,17 +148,20 @@ class Finalize {
       if (txResponse.isFailure()) return txResponse;
     }
 
+    let transactionReceiptMap = {};
     if (oThis.revertedBlock) {
       let processBlockResponse = await oThis.reProcessBlock();
 
       if (processBlockResponse.isFailure()) return processBlockResponse;
+      transactionReceiptMap = processBlockResponse.data.transactionReceiptMap;
     }
 
     return responseHelper.successWithData({
       processedBlock: oThis.blockToProcess,
       blockProcessable: true,
       processedTransactions: oThis.currentBlockInfo.transactions,
-      blockReverted: oThis.revertedBlock
+      blockReProcessed: oThis.revertedBlock,
+      processedTransactionsReceipts: transactionReceiptMap
     });
   }
 
@@ -325,7 +328,7 @@ class Finalize {
       return response;
     }
 
-    return responseHelper.successWithData({});
+    return responseHelper.successWithData({transactionReceiptMap: response.data.transactionReceiptMap});
   }
 }
 
