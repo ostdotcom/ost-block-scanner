@@ -157,7 +157,8 @@ class Finalize {
     return responseHelper.successWithData({
       processedBlock: oThis.blockToProcess,
       blockProcessable: true,
-      processedTransactions: oThis.currentBlockInfo.transactions
+      processedTransactions: oThis.currentBlockInfo.transactions,
+      blockReverted: oThis.revertedBlock
     });
   }
 
