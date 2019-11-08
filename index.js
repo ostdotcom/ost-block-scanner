@@ -23,6 +23,7 @@ require(rootPrefix + '/lib/models/shared/ShardByTransaction');
 require(rootPrefix + '/lib/models/sharded/byEconomyAddress/EconomyAddressTransfer');
 require(rootPrefix + '/lib/models/shared/ChainCronData');
 require(rootPrefix + '/lib/models/sharded/byChainId/PendingTransaction');
+require(rootPrefix + '/lib/models/shared/LatestPricePoint');
 
 // Model services
 require(rootPrefix + '/services/AddChain');
@@ -71,6 +72,7 @@ require(rootPrefix + '/lib/cacheMultiManagement/shared/shardIdentifier/ByEconomy
 require(rootPrefix + '/lib/cacheManagement/chainSpecific/EconomyAddressTransfer');
 require(rootPrefix + '/lib/cacheMultiManagement/chainSpecific/PendingTransactionByHash');
 require(rootPrefix + '/lib/cacheMultiManagement/chainSpecific/PendingTransactionByUuid');
+require(rootPrefix + '/lib/cacheManagement/shared/LatestPricePoints');
 
 require(rootPrefix + '/services/economy/Create');
 require(rootPrefix + '/services/economy/Aggregator');
@@ -116,6 +118,7 @@ class OSTBlockScanner {
       coreConstants.icNameSpace,
       'PendingTransactionModel'
     );
+    model.LatestPricePoint = instanceComposer.getShadowedClassFor(coreConstants.icNameSpace, 'LatestPricePointModel');
 
     const service = (oThis.service = {});
     // Add services here
@@ -201,6 +204,8 @@ class OSTBlockScanner {
       coreConstants.icNameSpace,
       'PendingTransactionByUuidCache'
     );
+
+    cache.LatestPricePoint = instanceComposer.getShadowedClassFor(coreConstants.icNameSpace, 'LatestPricePointsCache');
   }
 }
 
