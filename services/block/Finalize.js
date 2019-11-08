@@ -328,7 +328,7 @@ class Finalize {
       return response;
     }
 
-    return responseHelper.successWithData({transactionReceiptMap: response.data.transactionReceiptMap});
+    return responseHelper.successWithData({ transactionReceiptMap: response.data.transactionReceiptMap });
   }
 }
 
