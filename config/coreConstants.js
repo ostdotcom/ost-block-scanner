@@ -51,6 +51,15 @@ class CoreConstants {
   get icNameSpace() {
     return 'ost-block-scanner';
   }
+
+  /**
+   * Return zero address.
+   *
+   * @return {String}
+   */
+  get zeroAddress() {
+    return '0x0000000000000000000000000000000000000000';
+  }
 }
 
 module.exports = new CoreConstants();

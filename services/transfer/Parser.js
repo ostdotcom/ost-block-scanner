@@ -351,14 +351,16 @@ class TokenTransferParser extends ServiceBase {
         new Promise(function(onResolve, onReject) {
           tokenTrxModelObj
             .batchWriteItem(insertParams[shardId])
-            .then(function(resp) {
-              oThis._clearTransfersCache(insertParams[shardId]);
+            .then(async function(resp) {
               if (!resp || resp.isFailure()) {
                 logger.debug('Token transfers insertion failed ', resp);
                 for (let index in insertParams[shardId]) {
                   oThis.insertionFailedTransactions.push(insertParams[shardId][index].transactionHash);
                 }
               }
+              // else {
+              //   await oThis._resetTransfersRelatedCache(insertParams[shardId]);
+              // }
               onResolve();
             })
             .catch(function(err) {
@@ -423,6 +425,7 @@ class TokenTransferParser extends ServiceBase {
             blockTimestamp: oThis.blockDetails.timestamp,
             isUpdate: alreadyPresent ? 1 : 0
           },
+          {},
           { conversionFactor: economiesData[contractAddress].conversionFactor }
         );
       economyInsertPromise.push(createEconomyObj.perform());
@@ -468,7 +471,7 @@ class TokenTransferParser extends ServiceBase {
         })
       );
     } else if (
-      addAddrTrxResponse.data.insertionFailed ||
+      addAddrTrxResponse.data.batchWriteFailed ||
       Object.keys(addAddrTrxResponse.data.economyAddressShardsNotFound).length > 0
     ) {
       // As entry in address transfers didn't went through mark them dirty.
@@ -505,43 +508,44 @@ class TokenTransferParser extends ServiceBase {
   }
 
   /**
-   * Clear token transfers cache
+   * Set or clear transfers related cache on successful writes
    *
+   * @param transferRows
    * @returns {Promise<void>}
+   * @private
    */
-  _clearTransfersCache(transferRows) {
-    const oThis = this;
-
-    let eventIndexMap = {},
-      balanceCacheClearMap = {};
-    for (let index in transferRows) {
-      let te = transferRows[index];
-      eventIndexMap[te.transactionHash] = eventIndexMap[te.transactionHash] || [];
-      eventIndexMap[te.transactionHash].push(te.eventIndex);
-
-      balanceCacheClearMap[te.contractAddress] = balanceCacheClearMap[te.contractAddress] || [];
-      balanceCacheClearMap[te.contractAddress].push(te.fromAddress);
-      balanceCacheClearMap[te.contractAddress].push(te.toAddress);
-    }
-
-    let cacheKlass = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'TokenTransferCache'),
-      cacheObj = new cacheKlass({
-        chainId: oThis.chainId,
-        transactionHashEventIndexesMap: eventIndexMap
-      });
-
-    cacheObj.clear();
-
-    let AddressBalanceCacheClass = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'AddressBalanceCache');
-    for(let contractAddress in balanceCacheClearMap){
-      new AddressBalanceCacheClass({
-        chainId: oThis.chainId,
-        economyContractAddress: contractAddress,
-        addresses: balanceCacheClearMap[contractAddress]
-      }).clear()
-    }
-
-  }
+  // async _resetTransfersRelatedCache(transferRows) {
+  //   const oThis = this;
+  //
+  //   let eventIndexMap = {},
+  //     balanceCacheClearMap = {};
+  //   for (let index in transferRows) {
+  //     let te = transferRows[index];
+  //     eventIndexMap[te.transactionHash] = eventIndexMap[te.transactionHash] || [];
+  //     eventIndexMap[te.transactionHash].push(te.eventIndex);
+  //
+  //     balanceCacheClearMap[te.contractAddress] = balanceCacheClearMap[te.contractAddress] || [];
+  //     balanceCacheClearMap[te.contractAddress].push(te.fromAddress);
+  //     balanceCacheClearMap[te.contractAddress].push(te.toAddress);
+  //   }
+  //
+  //   let cacheKlass = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'TokenTransferCache'),
+  //     cacheObj = new cacheKlass({
+  //       chainId: oThis.chainId,
+  //       transactionHashEventIndexesMap: eventIndexMap
+  //     });
+  //
+  //   await cacheObj.setTransfersCache(transferRows);
+  //
+  //   let AddressBalanceCacheClass = oThis.ic().getShadowedClassFor(coreConstants.icNameSpace, 'AddressBalanceCache');
+  //   for (let contractAddress in balanceCacheClearMap) {
+  //     new AddressBalanceCacheClass({
+  //       chainId: oThis.chainId,
+  //       economyContractAddress: contractAddress,
+  //       addresses: balanceCacheClearMap[contractAddress]
+  //     }).clear();
+  //   }
+  // }
 }
 
 InstanceComposer.registerAsShadowableClass(TokenTransferParser, coreConstants.icNameSpace, 'TokenTransferParser');

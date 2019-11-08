@@ -98,6 +98,9 @@
       ]
     }
   ],
+  "nonDDBDataSource": {
+    "transactionDetails": "chain"
+  },
   "extraStorageColumns": {
     "chains": {
       "chainName": {
