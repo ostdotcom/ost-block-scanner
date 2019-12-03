@@ -1,3 +1,6 @@
+## ost-block-scanner v1.0.2-beta.1
+- Version bump for dependencies.
+
 ## ost-block-scanner v1.0.1
 - Upgraded node version to 10.x
 - Version bump for dependencies.
