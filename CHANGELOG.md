@@ -1,4 +1,4 @@
-## ost-block-scanner v1.0.2-beta.1
+## ost-block-scanner v1.0.2-beta.2
 - Version bump for dependencies.
 
 ## ost-block-scanner v1.0.1
